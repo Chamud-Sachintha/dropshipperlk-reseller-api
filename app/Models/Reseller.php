@@ -48,4 +48,10 @@ class Reseller extends Model
 
         return $this->where($map)->count();
     }
+
+    public function find_by_phone($phone) {
+        $map['phone_number'] = $phone;
+
+        return $this->where($map)->first();
+    }
 }
