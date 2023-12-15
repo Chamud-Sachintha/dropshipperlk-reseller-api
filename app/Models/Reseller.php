@@ -17,6 +17,8 @@ class Reseller extends Model
         'nic_number',
         'email',
         'password',
+        'token',
+        'login_time',
         'ref_code',
         'code',
         'create_time'
@@ -49,8 +51,21 @@ class Reseller extends Model
         return $this->where($map)->count();
     }
 
+    public function update_login_token($uid, $tokenInfo) {
+        $map['token'] = $tokenInfo['token'];
+        $map['login_time'] = $tokenInfo['loginTime'];
+
+        return $this->where(array('id' => $uid))->update($map);
+    }
+
     public function find_by_phone($phone) {
         $map['phone_number'] = $phone;
+
+        return $this->where($map)->first();
+    }
+
+    public function find_by_token($token) {
+        $map['token'] = $token;
 
         return $this->where($map)->first();
     }

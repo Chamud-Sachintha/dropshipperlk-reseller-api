@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
+use App\Models\KYCInformation;
 use App\Models\Reseller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,11 +13,13 @@ class AuthController extends Controller
 {
     private $AppHelper;
     private $Reseller;
+    private $KYCInfo;
 
     public function __construct()
     {
         $this->Reseller = new Reseller();
         $this->AppHelper = new AppHelper();
+        $this->KYCInfo = new KYCInformation();
     }
 
     public function registerNewReseller(Request $request) {
@@ -100,13 +103,54 @@ class AuthController extends Controller
                 $resp = $this->Reseller->find_by_phone($userName);
 
                 if ($resp && Hash::check($password, $resp['password'])) {
-                    return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $resp);
+
+                    $token = $this->AppHelper->generateAuthToken($resp);
+
+                    $tokenInfo = array();
+                    $tokenInfo['token'] = $token;
+                    $tokenInfo['loginTime'] = $this->AppHelper->day_time();
+                    $token_time = $this->Reseller->update_login_token($resp['id'], $tokenInfo);
+
+                    $isProfileOk = $this->checkProfile($resp->id);
+
+                    if ($isProfileOk == 0) {
+                        return $this->AppHelper->responseEntityHandle(2, "Please Submit Your KYC Informations", $resp, $token);
+                    } else if ($isProfileOk == 1) {
+                        return $this->AppHelper->responseEntityHandle(3, "KYC Still Pending", $resp);
+                    } else {
+                        return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $resp);
+                    }
                 } else {
                     return $this->AppHelper->responseMessageHandle(0, "Invalid Credentials");
                 }
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
+        }
+    }
+
+    private function checkProfile($clientId) {
+
+        /*
+            0 - not submited
+            1 - pending
+            2 - approved
+        */
+
+        try {
+            $resp = $this->KYCInfo->get_kyc_by_uid($clientId);
+
+            if (!empty($resp)) {
+                if ($resp->status != 1) {
+                    return 1;
+                } else {
+                    return 2;
+                }
+            } else {
+                return 0;
+            }
+        } catch (\Exception $e) {
+            return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
         }
     }
 

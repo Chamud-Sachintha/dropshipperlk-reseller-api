@@ -22,6 +22,8 @@ class CreateResellersTable extends Migration
             $table->string('nic_number');
             $table->string('email');
             $table->string('password');
+            $table->string('token')->nullable();
+            $table->integer('login_time')->nullable();
             $table->string('ref_code');
             $table->string('code');
             $table->integer('create_time');
