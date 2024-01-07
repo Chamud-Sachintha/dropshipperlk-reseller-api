@@ -116,9 +116,9 @@ class AuthController extends Controller
                     if ($isProfileOk == 0) {
                         return $this->AppHelper->responseEntityHandle(2, "Please Submit Your KYC Informations", $resp, $token);
                     } else if ($isProfileOk == 1) {
-                        return $this->AppHelper->responseEntityHandle(3, "KYC Still Pending", $resp);
+                        return $this->AppHelper->responseEntityHandle(3, "KYC Still Pending", $resp, $token);
                     } else {
-                        return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $resp);
+                        return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $resp, $token);
                     }
                 } else {
                     return $this->AppHelper->responseMessageHandle(0, "Invalid Credentials");

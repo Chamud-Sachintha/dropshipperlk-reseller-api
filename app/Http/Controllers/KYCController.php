@@ -6,6 +6,8 @@ use App\Helpers\AppHelper;
 use App\Models\KYCInformation;
 use App\Models\Reseller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class KYCController extends Controller
@@ -62,10 +64,37 @@ class KYCController extends Controller
         }
     }
 
+    public function getSubmitedKycList(Request $request) {
+
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+        $sellerId = (is_null($request->sellerId) || empty($request->sellerId)) ? "" : $request->sellerId;
+
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else if ($sellerId == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Seller Id is required.");
+        } else {
+
+            try {
+                $resp = $this->KYCModel->get_kyc_by_uid($sellerId);
+
+                $dataList = array();
+                foreach ($resp as $key => $value) {
+                    // $dataList[$key]['']
+                }
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }   
+        }
+    }
+
     private function decodeImage($imageData) {
 
-        $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imageData));
+        $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imageData));
         $imageFileName = 'image_' . time() . Str::random(5) . '.png';
+
+        // Storage::kyc('kyc')->put($imageFileName, $image);
+        file_put_contents(public_path() . '/kyc' . '/' . $imageFileName, $image);
 
         return $imageFileName;
     }

@@ -70,4 +70,8 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    'kyc' => [
+        public_path('storage') => storage_path('app/public/kyc'),
+    ],
+
 ];
