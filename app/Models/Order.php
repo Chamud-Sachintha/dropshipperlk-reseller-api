@@ -52,6 +52,12 @@ class Order extends Model
         return $this->create($map);
     }
 
+    public function get_order_by_order_number($orderNumber) {
+        $map['order'] = $orderNumber;
+
+        return $this->where($map)->first();
+    }
+
     public function get_all() {
         return $this->all();
     }

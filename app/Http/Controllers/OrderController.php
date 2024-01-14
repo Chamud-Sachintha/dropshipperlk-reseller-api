@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Reseller;
@@ -16,6 +17,7 @@ class OrderController extends Controller
     private $Order;
     private $Product;
     private $ResellProduct;
+    private $Category;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class OrderController extends Controller
         $this->Order = new Order();
         $this->Product = new Product();
         $this->ResellProduct = new ResellProduct();
+        $this->Category = new Category();
     }
 
     public function placeNewOrderRequest(Request $request) {
@@ -153,6 +156,100 @@ class OrderController extends Controller
                 }
 
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
+    }
+
+    public function getOrderInfoByOrderNumber(Request $request) {
+
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+        $orderNumber = (is_null($request->orderNumber) || empty($request->orderNumber)) ? "" : $request->orderNumber;
+
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else if ($orderNumber == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else {
+
+            try {
+                $order_info = $this->Order->get_order_by_order_number($orderNumber);
+                
+                $dataList = array();
+                if ($order_info) {
+
+                    $product_info = $this->Product->find_by_id($order_info['product_id']);
+                    $category_info = $this->Category->find_by_id($product_info['category']);
+
+                    $dataList['productName'] = $product_info['product_name'];
+                    $dataList['categoryName'] = $category_info['category_name'];
+                    $dataList['quantity'] = $order_info['quantity'];
+                    $dataList['totalAmount'] = $order_info['total_amount'];
+
+                    if ($order_info['payment_status'] == 0) {
+                        $dataList['paymentStatus'] = "Pending";
+                    } else if ($order_info['payment_status'] == 1) {
+                        $dataList['paymentStatus'] = "Paid";
+                    } else {
+                        $dataList['paymentStatus'] = "Refund";
+                    }
+
+                    if ($order_info['order_status'] == 0) {
+                        $dataList['orderStatus'] = "Pending";
+                    } else if ($order_info['order_status'] == 1) {
+                        $dataList['orderStatus'] = "Hold";
+                    } else if ($order_info['order_status'] == 2) {
+                        $dataList['orderStatus'] = "Packaging";
+                    } else if ($order_info['order_status'] == 3) {
+                        $dataList['orderStatus'] = "Cancle";
+                    } else if ($order_info['order_status'] == 4) {
+                        $dataList['orderStatus'] = "In Courier";
+                    } else {
+                        $dataList['orderStatus'] = "Delivered";
+                    }
+
+                    $dataList['cancleOrder'] = 0;
+
+                    if ($order_info['order_status'] < 4) {
+                        $dataList['cancleOrder'] = 1;
+                    }
+
+                    $dataList['teamCommision'] = $product_info['team_commision'];
+                    $dataList['directCommision'] = $product_info['direct_commision'];
+                    $dataList['orderPlaceDate'] = $order_info['create_time'];
+
+                    return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+                }
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
+    }
+
+    public function cancleOrder(Request $request) {
+
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+        $orderNumber = (is_null($request->orderNumber) || empty($request->orderNumber)) ? "" : $request->orderNumber;
+
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else if ($orderNumber == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else {
+
+            try {
+                $order_info = $this->Order->get_order_by_order_number($orderNumber);
+
+                if ($order_info) {
+                    if ($order_info['order_status'] < 4) {
+
+                    } else {
+                        return $this->AppHelper->responseMessageHandle(0, "Cannot Close Order.");
+                    }
+                } else {
+                    return $this->AppHelper->responseMessageHandle(0, "Error Occured.");
+                }
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
