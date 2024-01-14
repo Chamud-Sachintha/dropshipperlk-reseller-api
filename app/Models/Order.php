@@ -12,7 +12,7 @@ class Order extends Model
     protected $fillable = [
         'reseller_id',
         'product_id',
-        'order',
+        'order',                                // order number
         'name',
         'address',
         'city',
@@ -22,6 +22,7 @@ class Order extends Model
         'quantity',
         'total_amount',
         'payment_method',
+        'bank_slip',
         'payment_status',                       // 0- pending 1- paid  2- refund
         'order_status',                         // 0 - pending 1- hold 2- packaging 3- cancel 4- in courier 5- delivered
         'tracking_number',
@@ -42,11 +43,16 @@ class Order extends Model
         $map['quantity'] = $orderInfo['quantity'];
         $map['total_amount'] = $orderInfo['totalAmount'];
         $map['payment_method'] = $orderInfo['paymentMethod'];
+        $map['bank_slip'] = $orderInfo['bankSlip'];
         $map['payment_status'] = 0;
         $map['order_status'] = 0;
         $map['is_reseller_completed'] = $orderInfo['isResellerCompleted'];
         $map['create_time'] = $orderInfo['createTime'];
 
         return $this->create($map);
+    }
+
+    public function get_all() {
+        return $this->all();
     }
 }

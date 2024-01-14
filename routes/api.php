@@ -37,3 +37,4 @@ Route::middleware('authToken')->post('resell-product', [ResellProductController:
 Route::middleware('authToken')->post('get-resell-product-list', [ResellProductController::class, 'getAllResellProducts']);
 
 Route::middleware('authToken')->post('place-order', [OrderController::class, 'placeNewOrderRequest']);
+Route::middleware('authToken')->post('get-order-list', [OrderController::class, 'getOrderList']);

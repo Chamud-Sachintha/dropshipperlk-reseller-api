@@ -38,6 +38,7 @@ class OrderController extends Controller
         $s_contact = (is_null($request->secondContact) || empty($request->secondContact)) ? "" : $request->secondContact;
         $paymentMethod = (is_null($request->paymentMethod) || empty($request->paymentMethod)) ? "" : $request->paymentMethod;
         $quantity = (is_null($request->quantity) || empty($request->quantity)) ? "" : $request->quantity;
+        $bankSlip = (is_null($request->bankSlip) || empty($request->bankSlip)) ? "" : $request->bankSlip;
 
         if ($request_token == "") {
             return $this->AppHelper->responseMessageHandle(0, "Token is required.");
@@ -78,6 +79,13 @@ class OrderController extends Controller
                     $orderInfo['quantity'] = $quantity;
                     $orderInfo['totalAmount'] = $resell_product['price'] * $quantity;
                     $orderInfo['paymentMethod'] = $paymentMethod;
+                    
+                    if ($bankSlip != "") {
+                        $orderInfo['bankSlip'] = $this->AppHelper->decodeImage($bankSlip);
+                    } else {
+                        $orderInfo['bankSlip'] = null;
+                    }
+                    
                     $orderInfo['isResellerCompleted'] = 0;
                     $orderInfo['createTime'] = $this->AppHelper->get_date_and_time();
 
@@ -89,6 +97,62 @@ class OrderController extends Controller
                         return $this->AppHelper->responseMessageHandle(0, "Error Occured.");
                     }
                 }
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
+    }
+
+    public function getOrderList(Request $request) {
+
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else {
+
+            try {
+                $resp = $this->Order->get_all();
+
+                $dataList = array();
+                foreach ($resp as $key => $value) {
+
+                    $product_info = $this->Product->find_by_id($value['product_id']);
+                    $resell_info = $this->ResellProduct->find_by_pid_and_sid($value['reseller_id'], $value['product_id']);
+
+                    $dataList[$key]['orderNumber'] = $value['order'];
+                    $dataList[$key]['productName'] = $product_info['product_name'];
+                    $dataList[$key]['productPrice'] = $product_info['price'];
+                    $dataList[$key]['resellPrice'] = $resell_info['price'];
+                    $dataList[$key]['quantity'] = $value['quantity'];
+                    $dataList[$key]['totalAmount'] = $value['total_amount'];
+                    
+                    if ($value['payment_status'] == 0) {
+                        $dataList[$key]['paymentStatus'] = "Pending";
+                    } else if ($value['payment_status'] == 1) {
+                        $dataList[$key]['paymentStatus'] = "Paid";
+                    } else {
+                        $dataList[$key]['paymentStatus'] = "Refund";
+                    }
+
+                    if ($value['order_status'] == 0) {
+                        $dataList[$key]['orderStatus'] = "Pending";
+                    } else if ($value['order_status'] == 1) {
+                        $dataList[$key]['orderStatus'] = "Hold";
+                    } else if ($value['order_status'] == 2) {
+                        $dataList[$key]['orderStatus'] = "Packaging";
+                    } else if ($value['order_status'] == 3) {
+                        $dataList[$key]['orderStatus'] = "Cancle";
+                    } else if ($value['order_status'] == 4) {
+                        $dataList[$key]['orderStatus'] = "In Courier";
+                    } else {
+                        $dataList[$key]['orderStatus'] = "Delivered";
+                    }
+
+                    $dataList[$key]['orderPlaceDate'] = $value['create_time'];
+                }
+
+                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }

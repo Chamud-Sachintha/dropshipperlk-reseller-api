@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AppHelper {
 
@@ -47,6 +48,32 @@ class AppHelper {
         }
 
         return $result;
+    }
+
+    public function decodeImage($imageData) {
+
+        $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imageData));
+        $imageFileName = 'image_' . time() . Str::random(5) . '.png';
+
+        // Storage::kyc('kyc')->put($imageFileName, $image);
+        file_put_contents(public_path() . '/images' . '/' . $imageFileName, $image);
+
+        return $imageFileName;
+    }
+
+    public function encodeImage($imageName) {
+        $base64String = null;
+
+        try {
+            $path = public_path('avatar/' . $imageName);
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $base64String = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return $base64String;
     }
 }
 

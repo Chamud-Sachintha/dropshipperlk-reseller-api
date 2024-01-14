@@ -27,6 +27,7 @@ class CreateOrdersTable extends Migration
             $table->integer('quantity');
             $table->float('total_amount');
             $table->integer('payment_method');
+            $table->string('bank_slip')->nullable();
             $table->integer('payment_status')->default(0);
             $table->integer('order_status')->default(0);
             $table->string('tracking_number')->nullable();
