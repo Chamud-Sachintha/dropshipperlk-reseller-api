@@ -23,6 +23,7 @@ class ResellerTopSeeder extends Seeder
         $sellerInfo['address'] = 'Kiribathgoda';
         $sellerInfo['phoneNumber'] = '12345678';
         $sellerInfo['nicNumber'] = '200034304198';
+        $sellerInfo['profit_total'] = 0.0;
         $sellerInfo['email'] = 'chamudsachintha999@gmail.com';
         $sellerInfo['password'] = Hash::make(123);
         $sellerInfo['refCode'] = Str::random(5);

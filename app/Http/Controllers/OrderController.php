@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\AppHelper;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\OrderCancle;
 use App\Models\Product;
 use App\Models\Reseller;
 use App\Models\ResellProduct;
@@ -18,6 +19,7 @@ class OrderController extends Controller
     private $Product;
     private $ResellProduct;
     private $Category;
+    private $OrderCancleLog;
 
     public function __construct()
     {
@@ -27,6 +29,7 @@ class OrderController extends Controller
         $this->Product = new Product();
         $this->ResellProduct = new ResellProduct();
         $this->Category = new Category();
+        $this->OrderCancleLog = new OrderCancle();
     }
 
     public function placeNewOrderRequest(Request $request) {
@@ -192,7 +195,7 @@ class OrderController extends Controller
                     } else if ($order_info['payment_status'] == 1) {
                         $dataList['paymentStatus'] = "Paid";
                     } else {
-                        $dataList['paymentStatus'] = "Refund";
+                        $dataList['paymentStatus'] = "Refunded";
                     }
 
                     if ($order_info['order_status'] == 0) {
@@ -209,10 +212,15 @@ class OrderController extends Controller
                         $dataList['orderStatus'] = "Delivered";
                     }
 
+                    $dataList['orderCancled'] = 0;
                     $dataList['cancleOrder'] = 0;
 
                     if ($order_info['order_status'] < 4) {
                         $dataList['cancleOrder'] = 1;
+                    }
+
+                    if ($order_info['order_status'] == 3) {
+                        $dataList['orderCancled'] = 1;
                     }
 
                     $dataList['teamCommision'] = $product_info['team_commision'];
@@ -243,7 +251,25 @@ class OrderController extends Controller
 
                 if ($order_info) {
                     if ($order_info['order_status'] < 4) {
+                        $cancel_order = $this->Order->cancle_order_by_number($orderNumber);
 
+                        $cancle_log = null;
+                        if ($cancel_order) {
+                            $orderCancelLog = array();
+                            $orderCancelLog['orderId'] = $order_info['id'];
+                            $orderCancelLog['reseller'] = $order_info['reseller_id'];
+                            $orderCancelLog['totalAmount'] = $order_info['total_amount'];
+                            $orderCancelLog['status'] = 0;
+                            $orderCancelLog['createTime'] = $this->AppHelper->get_date_and_time();
+
+                            $cancle_log = $this->OrderCancleLog->add_log($orderCancelLog);
+                        }
+
+                        if ($cancel_order && $cancle_log) {
+                            return $this->AppHelper->responseMessageHandle(1, "Operation Complete");
+                        } else {
+                            return $this->AppHelper->responseMessageHandle(0, "Error Occired.");
+                        }
                     } else {
                         return $this->AppHelper->responseMessageHandle(0, "Cannot Close Order.");
                     }

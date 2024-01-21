@@ -58,6 +58,13 @@ class Order extends Model
         return $this->where($map)->first();
     }
 
+    public function cancle_order_by_number($orderNumber) {
+        $map['order'] = $orderNumber;
+        $map1['order_status'] = 3;
+
+        return $this->where($map)->update($map1);
+    }
+
     public function get_all() {
         return $this->all();
     }

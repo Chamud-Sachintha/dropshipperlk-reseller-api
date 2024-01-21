@@ -25,6 +25,7 @@ class CreateResellersTable extends Migration
             $table->string('token')->nullable();
             $table->integer('login_time')->nullable();
             $table->string('ref_code');
+            $table->float('profit_total');
             $table->string('code');
             $table->integer('create_time');
             $table->timestamps();

@@ -46,6 +46,7 @@ class ProductController extends Controller
                     $dataList[$key]['categoryName'] = $category->category_name;
                     $dataList[$key]['description'] = $value['description'];
                     $dataList[$key]['price'] = $value['price'];
+                    $dataList[$key]['images'] = json_decode($value['images'])->image0;
                     $dataList[$key]['createTime'] = $value['create_time'];
                 }
 
@@ -98,6 +99,12 @@ class ProductController extends Controller
                         $dataList['isResell'] = false;
                     }
 
+                    $in_colombo_fees = $this->getCourierCharge(true, $resp['weight']);
+                    $out_of_colombo_fees = $this->getCourierCharge(false, $resp['weight']);
+
+                    $dataList['in_colombo_charges'] = $in_colombo_fees;
+                    $dataList['out_of_colombo_charges'] = $out_of_colombo_fees;
+
                     return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
 
                 } else {
@@ -107,5 +114,26 @@ class ProductController extends Controller
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
         }
+    }
+
+    private function getCourierCharge($is_colombo, $product_weight) {
+
+        $default_charge = 300;
+        $weight_in_kg = ($product_weight) / 1000;
+
+        if ($weight_in_kg > 1) {
+            $remaining = $weight_in_kg - 1;
+            $round_remaining = ceil($remaining);
+            
+            if ($round_remaining > 0) {
+                $default_charge += ($round_remaining * 50);
+            }
+        }
+
+        if (!$is_colombo) {
+            $default_charge += 50;
+        }
+
+        return $default_charge;
     }
 }
