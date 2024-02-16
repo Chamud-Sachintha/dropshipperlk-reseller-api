@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\ProfitShare;
 use App\Models\Reseller;
 use Illuminate\Http\Request;
@@ -12,12 +14,16 @@ class ProfitShareController extends Controller
     private $AppHelper;
     private $ProfitShareLog;
     private $Reseller;
+    private $Product;
+    private $Order;
 
     public function __construct()
     {
         $this->AppHelper = new AppHelper();
         $this->ProfitShareLog = new ProfitShare();
         $this->Reseller = new Reseller();
+        $this->Product = new Product();
+        $this->Order = new Order();
     }
 
     public function getProfitShareLogBySeller(Request $request) {
@@ -28,17 +34,42 @@ class ProfitShareController extends Controller
             return $this->AppHelper->responseMessageHandle(0, "Token is required");
         } else {
 
-            try {
+            // try {
                 $seller_info = $this->Reseller->find_by_token($request_token);
                 $resp = $this->ProfitShareLog->get_log_by_seller($seller_info['id']);
 
                 $dataList = array();
                 foreach ($resp as $key => $value) {
-                    
+                    $product_info = $this->Product->find_by_id($value['product_id']);
+                    // $order_info = $this->Order->find_by_id($value['order_id']);
+
+                    $dataList[$key]['orderNumber'] = $value['order_id'];
+
+                    if ($value['product_id'] != 0) {
+                        $dataList[$key]['productName'] = $product_info['product_name'];
+                    } else {
+                        $dataList[$key]['productName'] = 0;
+                    }
+
+                    if ($value['type'] == 1) {
+                        $dataList[$key]['logType'] = "Transfer In";
+                    } else {
+                        $dataList[$key]['logType'] = "Transfer Out";
+                    }
+
+                    $dataList[$key]['resellPrice'] = $value['resell_price'];
+                    $dataList[$key]['quantity'] = $value['quantity'];
+                    $dataList[$key]['totalAmount'] = $value['total_amount'];
+                    $dataList[$key]['profit'] = $value['profit'];
+                    $dataList[$key]['directCommision'] = $value['direct_commision'];
+                    $dataList[$key]['teamCommision'] = $value['team_commision'];
+                    $dataList[$key]['profitTotal'] = $value['profit_total'];
                 }
-            } catch (\Exception $e) {
-                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
-            }
+
+                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+            // } catch (\Exception $e) {
+            //     return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            // }
         }
     }
 }

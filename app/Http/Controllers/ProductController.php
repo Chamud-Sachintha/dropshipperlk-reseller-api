@@ -86,6 +86,7 @@ class ProductController extends Controller
                     $dataList['waranty'] = $resp['waranty'];
                     $dataList['teamCommision'] = $resp['team_commision'];
                     $dataList['directCommision'] = $resp['direct_commision'];
+                    $dataList['images']= json_decode($resp->images);
 
                     if ($resp['stock_count'] > 0) {
                         $dataList['inStock'] = true;

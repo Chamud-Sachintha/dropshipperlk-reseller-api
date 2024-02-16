@@ -189,6 +189,7 @@ class OrderController extends Controller
                     $dataList['categoryName'] = $category_info['category_name'];
                     $dataList['quantity'] = $order_info['quantity'];
                     $dataList['totalAmount'] = $order_info['total_amount'];
+                    $dataList['images'] = json_decode($product_info['images']);
 
                     if ($order_info['payment_status'] == 0) {
                         $dataList['paymentStatus'] = "Pending";

@@ -68,7 +68,7 @@ class AuthController extends Controller
                     $sellerInfo['email'] = $email;
                     $sellerInfo['password'] = Hash::make($password);
                     $sellerInfo['refCode'] = $refCode;
-                    $sellerInfo['code'] = Str::random(5);
+                    $sellerInfo['code'] = $this->generateUniqueRefCode();
                     $sellerInfo['createTime'] = $this->AppHelper->get_date_and_time();
 
                     $resellerResp = $this->Reseller->add_log($sellerInfo);
@@ -126,6 +126,18 @@ class AuthController extends Controller
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
+        }
+    }
+
+    private function generateUniqueRefCode() {
+        $ref_code = Str::random(5);
+
+        $is_exist = $this->Reseller->find_by_ref_code($ref_code);
+
+        if ($is_exist) {
+            $this->generateUniqueRefCode();
+        } else {
+            return $ref_code;
         }
     }
 

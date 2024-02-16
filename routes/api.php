@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KYCController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfitShareController;
 use App\Http\Controllers\ResellerController;
 use App\Http\Controllers\ResellProductController;
 use Illuminate\Http\Request;
@@ -40,3 +42,7 @@ Route::middleware('authToken')->post('place-order', [OrderController::class, 'pl
 Route::middleware('authToken')->post('get-order-list', [OrderController::class, 'getOrderList']);
 Route::middleware('authToken')->post('get-order-info', [OrderController::class, 'getOrderInfoByOrderNumber']);
 Route::middleware('authToken')->post('cancle-order', [OrderController::class, 'cancleOrder']);
+
+Route::middleware('authToken')->post('get-profit-log', [ProfitShareController::class, 'getProfitShareLogBySeller']);
+Route::middleware('authToken')->post('dashboard-data', [DashboardController::class, 'getDashboardData']);
+Route::middleware('authToken')->post('get-team', [ResellerController::class, 'getTeam']);

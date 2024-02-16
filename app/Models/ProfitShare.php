@@ -11,6 +11,8 @@ class ProfitShare extends Model
 
     protected $fillable = [
         'reseller_id',
+        'order_id',
+        'type',
         'product_id',
         'product_price',
         'resell_price',
@@ -28,5 +30,11 @@ class ProfitShare extends Model
         $map['reseller_id'] = $seller;
 
         return $this->where($map)->orderBy('create_time', 'desc')->get();
+    }
+
+    public function get_total_earnings($seller) {
+        $map['reseller_id'] = $seller;
+        
+        return $this->where($map)->sum('profit_total');
     }
 }

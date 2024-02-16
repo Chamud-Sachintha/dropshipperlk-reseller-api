@@ -58,6 +58,18 @@ class Reseller extends Model
         return $this->where(array('id' => $uid))->update($map);
     }
 
+    public function find_by_ref_code($refCode) {
+        $map['code'] = $refCode;
+
+        return $this->where($map)->first();
+    }
+
+    public function get_team_by_ref_code($refCode) {
+        $map['ref_code'] = $refCode;
+
+        return $this->where($map)->get();
+    }
+
     public function find_by_phone($phone) {
         $map['phone_number'] = $phone;
 
