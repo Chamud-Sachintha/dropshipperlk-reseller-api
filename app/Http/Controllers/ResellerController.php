@@ -27,7 +27,7 @@ class ResellerController extends Controller
             try {
                 $reseller_info = $this->Reseller->find_by_token($request_token);
 
-                $team = $this->Reseller->find_by_ref_code($reseller_info->code);
+                $team = $this->Reseller->get_team_by_ref_code($reseller_info->code);
 
                 $dataList = array();
                 foreach ($team as $key => $value) {

@@ -119,6 +119,12 @@ class Order extends Model
         return $this->where($map)->sum("total_amount");
     }
 
+    public function get_by_seller($seller) {
+        $map['reseller_id'] = $seller;
+
+        return $this->where($map)->get();
+    }
+
     public function get_all() {
         return $this->all();
     }

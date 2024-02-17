@@ -46,6 +46,7 @@ class DashboardController extends Controller
             $dataList['paidOrders'] = $paid_orders;
             $dataList['totalEarnigs'] = $received_earnings;
             $dataList['pendingPayment'] = $pending_payment;
+            $dataList['refCode'] = $seller_info['code'];
 
             return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
         } else {

@@ -118,7 +118,9 @@ class OrderController extends Controller
         } else {
 
             try {
-                $resp = $this->Order->get_all();
+                // $resp = $this->Order->get_all();
+                $seller_info = $this->Reseller->find_by_token($request_token);
+                $resp = $this->Order->get_by_seller($seller_info->id);
 
                 $dataList = array();
                 foreach ($resp as $key => $value) {
