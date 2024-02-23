@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KYCController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderEnController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfitShareController;
@@ -40,9 +42,16 @@ Route::middleware('authToken')->post('get-resell-product-list', [ResellProductCo
 
 Route::middleware('authToken')->post('place-order', [OrderController::class, 'placeNewOrderRequest']);
 Route::middleware('authToken')->post('get-order-list', [OrderController::class, 'getOrderList']);
-Route::middleware('authToken')->post('get-order-info', [OrderController::class, 'getOrderInfoByOrderNumber']);
+Route::middleware('authToken')->post('get-order-info', [OrderController::class, 'getOrderInfoListByOrderNumberNew']);
 Route::middleware('authToken')->post('cancle-order', [OrderController::class, 'cancleOrder']);
 
 Route::middleware('authToken')->post('get-profit-log', [ProfitShareController::class, 'getProfitShareLogBySeller']);
 Route::middleware('authToken')->post('dashboard-data', [DashboardController::class, 'getDashboardData']);
 Route::middleware('authToken')->post('get-team', [ResellerController::class, 'getTeam']);
+
+Route::middleware('authToken')->post('add-to-cart', [CartController::class, 'addCartProduct']);
+Route::middleware('authToken')->post('get-cart-items-count', [CartController::class, 'getCartItemsCount']);
+Route::middleware('authToken')->post('get-cart-items-list', [CartController::class, 'getCartItems']);
+
+Route::middleware('authToken')->post('place-order-by-cart', [OrderEnController::class, 'placeNewOrder']);
+Route::middleware('authToken')->post('remove-product-from-list', [ResellProductController::class, 'removeResellProduct']);

@@ -6,6 +6,7 @@ use App\Helpers\AppHelper;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderCancle;
+use App\Models\OrderEn;
 use App\Models\Product;
 use App\Models\Reseller;
 use App\Models\ResellProduct;
@@ -20,6 +21,7 @@ class OrderController extends Controller
     private $ResellProduct;
     private $Category;
     private $OrderCancleLog;
+    private $OrderEn;
 
     public function __construct()
     {
@@ -30,6 +32,7 @@ class OrderController extends Controller
         $this->ResellProduct = new ResellProduct();
         $this->Category = new Category();
         $this->OrderCancleLog = new OrderCancle();
+        $this->OrderEn = new  OrderEn();
     }
 
     public function placeNewOrderRequest(Request $request) {
@@ -120,7 +123,8 @@ class OrderController extends Controller
             try {
                 // $resp = $this->Order->get_all();
                 $seller_info = $this->Reseller->find_by_token($request_token);
-                $resp = $this->Order->get_by_seller($seller_info->id);
+                // $resp = $this->Order->get_by_seller($seller_info->id);
+                $resp = $this->OrderEn->get_order_by_seller($seller_info['id']);
 
                 $dataList = array();
                 foreach ($resp as $key => $value) {
@@ -129,10 +133,10 @@ class OrderController extends Controller
                     $resell_info = $this->ResellProduct->find_by_pid_and_sid($value['reseller_id'], $value['product_id']);
 
                     $dataList[$key]['orderNumber'] = $value['order'];
-                    $dataList[$key]['productName'] = $product_info['product_name'];
-                    $dataList[$key]['productPrice'] = $product_info['price'];
-                    $dataList[$key]['resellPrice'] = $resell_info['price'];
-                    $dataList[$key]['quantity'] = $value['quantity'];
+                    // $dataList[$key]['productName'] = $product_info['product_name'];
+                    // $dataList[$key]['productPrice'] = $product_info['price'];
+                    // $dataList[$key]['resellPrice'] = $resell_info['price'];
+                    // $dataList[$key]['quantity'] = $value['quantity'];
                     $dataList[$key]['totalAmount'] = $value['total_amount'];
                     
                     if ($value['payment_status'] == 0) {
@@ -232,6 +236,132 @@ class OrderController extends Controller
 
                     return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
                 }
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
+    }
+
+    public function getOrderInfoListByOrderNumberNew(Request $request) {
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+        $orderNumber = (is_null($request->orderNumber) || empty($request->orderNumber)) ? "" : $request->orderNumber;
+
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else if ($orderNumber == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else {
+
+            try {
+                $order_info = $this->Order->get_order_by_order_number_new($orderNumber);
+
+                $direct_commision = 0;
+                $team_commision = 0;
+                $dataList = array();
+                foreach ($order_info as $key => $value) {
+                    $product_info = $this->Product->find_by_id($value['product_id']);
+                    $resell_info = $this->ResellProduct->find_by_pid_and_sid($value['reseller_id'], $value['product_id']);
+
+                    $dataList[$key]['productName'] = $product_info['product_name'];
+                    $dataList[$key]['productPrice'] = $product_info['price'];
+                    $dataList[$key]['resellPrice'] = $resell_info['price'];
+                    $dataList[$key]['quantity'] = $value['quantity'];
+                    $dataList[$key]['totalAmount'] = $value['total_amount'];
+
+                    $direct_commision += $product_info['direct_commision'];
+                    $team_commision += $product_info['team_commision'];
+                }
+
+                $order_info = $this->OrderEn->getOrderInfoByOrderNumber($orderNumber);
+
+                if ($order_info['payment_status'] == 0) {
+                    $dataList['paymentStatus'] = "Pending";
+                } else if ($order_info['payment_status'] == 1) {
+                    $dataList['paymentStatus'] = "Paid";
+                } else {
+                    $dataList['paymentStatus'] = "Refunded";
+                }
+
+                if ($order_info['order_status'] == 0) {
+                    $dataList['orderStatus'] = "Pending";
+                } else if ($order_info['order_status'] == 1) {
+                    $dataList['orderStatus'] = "Hold";
+                } else if ($order_info['order_status'] == 2) {
+                    $dataList['orderStatus'] = "Packaging";
+                } else if ($order_info['order_status'] == 3) {
+                    $dataList['orderStatus'] = "Cancle";
+                } else if ($order_info['order_status'] == 4) {
+                    $dataList['orderStatus'] = "In Courier";
+                } else {
+                    $dataList['orderStatus'] = "Delivered";
+                }
+
+                $dataList['orderCancled'] = 0;
+                $dataList['cancleOrder'] = 0;
+
+                if ($order_info['order_status'] < 4) {
+                    $dataList['cancleOrder'] = 1;
+                }
+
+                if ($order_info['order_status'] == 3) {
+                    $dataList['orderCancled'] = 1;
+                }
+
+                $dataList['directCommision'] = $direct_commision;
+                $dataList['teamCommision'] = $team_commision;
+
+                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
+    }
+
+    public function getOrderAdditionalInfoByOrderNumber(Request $request) {
+
+        $order_number = (is_null($request->orderNumber) || empty($request->orderNumber)) ? "" : $request->orderNumber;
+
+        if ($order_number == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Order Number is required.");
+        } else {
+
+            try {
+                $order_info = $this->OrderEn->getOrderInfoByOrderNumber($order_number);
+
+                $dataList = array();
+                if ($order_info['payment_status'] == 0) {
+                    $dataList['paymentStatus'] = "Pending";
+                } else if ($order_info['payment_status'] == 1) {
+                    $dataList['paymentStatus'] = "Paid";
+                } else {
+                    $dataList['paymentStatus'] = "Refunded";
+                }
+
+                if ($order_info['order_status'] == 0) {
+                    $dataList['orderStatus'] = "Pending";
+                } else if ($order_info['order_status'] == 1) {
+                    $dataList['orderStatus'] = "Hold";
+                } else if ($order_info['order_status'] == 2) {
+                    $dataList['orderStatus'] = "Packaging";
+                } else if ($order_info['order_status'] == 3) {
+                    $dataList['orderStatus'] = "Cancle";
+                } else if ($order_info['order_status'] == 4) {
+                    $dataList['orderStatus'] = "In Courier";
+                } else {
+                    $dataList['orderStatus'] = "Delivered";
+                }
+
+                $dataList['orderCancled'] = 0;
+                $dataList['cancleOrder'] = 0;
+
+                if ($order_info['order_status'] < 4) {
+                    $dataList['cancleOrder'] = 1;
+                }
+
+                if ($order_info['order_status'] == 3) {
+                    $dataList['orderCancled'] = 1;
+                }
+
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }

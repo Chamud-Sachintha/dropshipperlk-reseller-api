@@ -58,6 +58,25 @@ class Order extends Model
         return $this->where($map)->first();
     }
 
+    public function get_order_by_order_number_new($orderNumber) {
+        $map['order'] = $orderNumber;
+
+        return $this->where($map)->get();
+    }
+
+    public function get_items_by_pid_and_number($oder, $pid) {
+        $map['order'] = $oder;
+        $map['product_id'] = $pid;
+
+        return $this->where($map)->first();
+    }
+
+    public function get_order_items_by_order_number($orderNumber) {
+        $map['order'] = $orderNumber;
+
+        return $this->where($map)->get();
+    }
+
     public function cancle_order_by_number($orderNumber) {
         $map['order'] = $orderNumber;
         $map1['order_status'] = 3;

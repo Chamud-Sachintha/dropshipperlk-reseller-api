@@ -34,6 +34,13 @@ class ResellProduct extends Model
         return $this->where($map)->first();
     }
 
+    public function remove_product_by_seller_and_pid($seller, $pid) {
+        $map['reseller_id'] = $seller;
+        $map['product_id'] = $pid;
+
+        return $this->where($map)->delete();
+    }
+
     public function get_all($sid) {
         $map['reseller_id'] = $sid;
 

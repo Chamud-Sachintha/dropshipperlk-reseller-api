@@ -75,6 +75,11 @@ class AppHelper {
 
         return $base64String;
     }
+
+    public function getRootPath() {
+        $path = "http://localhost:8000/";
+        return $path;
+    }
 }
 
 ?>

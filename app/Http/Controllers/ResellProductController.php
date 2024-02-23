@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Category;
+use App\Models\Order;
+use App\Models\OrderEn;
 use App\Models\Product;
 use App\Models\Reseller;
 use App\Models\ResellProduct;
@@ -16,6 +20,10 @@ class ResellProductController extends Controller
     private $ResellProduct;
     private $Reseller;
     private $Category;
+    private $Cart;
+    private $CartItem;
+    private $OrderEn;
+    private $Order;
 
     public function __construct()
     {
@@ -24,6 +32,10 @@ class ResellProductController extends Controller
         $this->ResellProduct = new ResellProduct();
         $this->Reseller = new Reseller();
         $this->Category = new Category();
+        $this->Cart = new Cart();
+        $this->CartItem = new CartItem();
+        $this->OrderEn = new OrderEn();
+        $this->Order = new Order();
     }
 
     public function addNewResellProduct(Request $request) {
@@ -96,8 +108,52 @@ class ResellProductController extends Controller
                     $dataList[$key]['resellPrice'] = $value['price'];
                     $dataList[$key]['createTime'] = $product_info['create_time'];
                     $dataList[$key]['resellTime'] = $value['create_time'];
+                }
 
-                    return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
+    }
+
+    public function removeResellProduct(Request $request) {
+
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+        $productId = (is_null($request->productId) || empty($request->productId)) ? "" : $request->productId;
+
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else if ($productId == "") {
+            return $this->AppHelper->responseMessageHandle(0, "ProductId is required.");
+        } else {
+            
+            try {
+                $seller_info = $this->Reseller->find_by_token($request_token);
+
+                $cart = $this->Cart->getCartBySeller($seller_info->id);
+                $cart_items = $this->CartItem->validate_cart_item($productId, $cart->id);
+
+                $order = $this->OrderEn->get_order_by_seller_ongoing($seller_info->id);
+
+                if ($cart_items) {
+                    return $this->AppHelper->responseMessageHandle(0, "This Product Added to the Cart");
+                }
+
+                foreach ($order as $key => $value) {
+                    $order_items = $this->Order->get_items_by_pid_and_number($order->order, $productId);
+
+                    if ($order_items) {
+                        return $this->AppHelper->responseMessageHandle(0, "There is Order for This Product");
+                    }
+                }
+
+                $remove_product = $this->ResellProduct->remove_product_by_seller_and_pid($seller_info->id, $productId);
+
+                if ($remove_product) {
+                    return $this->AppHelper->responseMessageHandle(1, "Operation Complete");
+                } else {
+                    return $this->AppHelper->responseMessageHandle(0, "Error Occured.");
                 }
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
