@@ -128,26 +128,29 @@ class ResellProductController extends Controller
             return $this->AppHelper->responseMessageHandle(0, "ProductId is required.");
         } else {
             
-            try {
+            // try {
                 $seller_info = $this->Reseller->find_by_token($request_token);
 
                 $cart = $this->Cart->getCartBySeller($seller_info->id);
-                $cart_items = $this->CartItem->validate_cart_item($productId, $cart->id);
+
+                if ($cart) {
+                    $cart_items = $this->CartItem->validate_cart_item($productId, $cart->id);
+
+                    if ($cart_items) {
+                        return $this->AppHelper->responseMessageHandle(0, "This Product Added to the Cart");
+                    }
+                }
 
                 $order = $this->OrderEn->get_order_by_seller_ongoing($seller_info->id);
 
-                if ($cart_items) {
-                    return $this->AppHelper->responseMessageHandle(0, "This Product Added to the Cart");
-                }
-
                 foreach ($order as $key => $value) {
-                    $order_items = $this->Order->get_items_by_pid_and_number($order->order, $productId);
+                    $order_items = $this->Order->get_items_by_pid_and_number($value->order, $productId);
 
                     if ($order_items) {
                         return $this->AppHelper->responseMessageHandle(0, "There is Order for This Product");
                     }
                 }
-
+                // dd("d");
                 $remove_product = $this->ResellProduct->remove_product_by_seller_and_pid($seller_info->id, $productId);
 
                 if ($remove_product) {
@@ -155,9 +158,9 @@ class ResellProductController extends Controller
                 } else {
                     return $this->AppHelper->responseMessageHandle(0, "Error Occured.");
                 }
-            } catch (\Exception $e) {
-                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
-            }
+            // } catch (\Exception $e) {
+            //     return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            // }
         }
     }
 }

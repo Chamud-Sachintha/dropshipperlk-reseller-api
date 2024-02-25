@@ -151,6 +151,23 @@ class CartController extends Controller
                     $dataList[$key]['createTime'] = $value['create_time'];
                 }
 
+                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
+    }
+
+    public function getCartTotalAmount(Request $requerst) {
+        $requerst_token = (is_null($requerst->token) || empty($requerst->token)) ? "" : $requerst->token;
+
+        if ($requerst_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Toekn is required.");
+        } else {
+
+            try {
+                $selelr_info = $this->Reseller->find_by_token($requerst_token);
+                $cart_info = $this->Cart->getCartBySeller($selelr_info->id);
                 $dataList['totalAmount'] = $cart_info['cart_total'];
 
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);

@@ -252,7 +252,7 @@ class OrderController extends Controller
             return $this->AppHelper->responseMessageHandle(0, "Token is required.");
         } else {
 
-            try {
+            // try {
                 $order_info = $this->Order->get_order_by_order_number_new($orderNumber);
 
                 $direct_commision = 0;
@@ -261,7 +261,7 @@ class OrderController extends Controller
                 foreach ($order_info as $key => $value) {
                     $product_info = $this->Product->find_by_id($value['product_id']);
                     $resell_info = $this->ResellProduct->find_by_pid_and_sid($value['reseller_id'], $value['product_id']);
-
+                    // dd($resell_info['price']);
                     $dataList[$key]['productName'] = $product_info['product_name'];
                     $dataList[$key]['productPrice'] = $product_info['price'];
                     $dataList[$key]['resellPrice'] = $resell_info['price'];
@@ -311,9 +311,9 @@ class OrderController extends Controller
                 $dataList['teamCommision'] = $team_commision;
 
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
-            } catch (\Exception $e) {
-                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
-            }
+            // } catch (\Exception $e) {
+            //     return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            // }
         }
     }
 
