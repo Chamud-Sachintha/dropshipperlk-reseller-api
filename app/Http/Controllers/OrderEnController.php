@@ -43,6 +43,12 @@ class OrderEnController extends Controller
         $district = (is_null($request->district) || empty($request->district)) ? "" : $request->district;
         $f_contact = (is_null($request->firstContact) || empty($request->firstContact)) ? "" : $request->firstContact;
         $s_contact = (is_null($request->secondContact) || empty($request->secondContact)) ? "" : $request->secondContact;
+
+        $f_total = (is_null($request->FinalTotal) || empty($request->FinalTotal)) ? "" : $request->FinalTotal;
+        if (!empty($f_total) && substr($f_total, -3) !== '.00') {
+            $f_total .= '.00';
+        }
+        
         
         if ($request_token == "") {
             return $this->AppHelper->responseMessageHandle(0, "Token is required.");
@@ -50,8 +56,10 @@ class OrderEnController extends Controller
 
             try {
                 $seller_info = $this->Reseller->find_by_token($request_token);
-                $cart_info = $this->Cart->getCartBySeller($seller_info['id']);
+                $cart_info_total_update = Cart::where('seller_id', $seller_info['id'])->update(['cart_total' => $f_total]);
 
+                
+                $cart_info = $this->Cart->getCartBySeller($seller_info['id']);
                 $orderInfo = array();
 
                 if ($cart_info) {

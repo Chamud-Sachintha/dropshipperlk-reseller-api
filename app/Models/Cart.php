@@ -42,11 +42,5 @@ class Cart extends Model
         return $this->where($map)->delete();
     }
 
-    public function remove_product_from_cart_by_id($id) {
-        $map['id'] = $id;
-
-        return $this->where($map)->delete();
-    }
-
-    
+   
 }

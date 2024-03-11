@@ -51,4 +51,12 @@ class CartItem extends Model
 
         return $this->where($map)->count();
     }
+
+   
+
+    public function remove_product_from_cart_by_id($id) {
+        $map['id'] = $id;
+
+        return $this->where($map)->delete();
+    }
 }

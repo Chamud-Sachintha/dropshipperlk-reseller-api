@@ -139,6 +139,18 @@ class OrderController extends Controller
                     // $dataList[$key]['quantity'] = $value['quantity'];
                     $dataList[$key]['totalAmount'] = $value['total_amount'];
                     
+                    if ( $value['tracking_number'] == "") {
+                        $dataList[$key]['TrackingNumber'] = "-";
+                    } else {
+                        $dataList[$key]['TrackingNumber'] = $value['tracking_number'];
+                    }
+                    if ( $value['courier_name'] == "") {
+                        $dataList[$key]['courierName'] = "-";
+                    } else {
+                        $dataList[$key]['courierName'] = $value['courier_name'];
+                    }
+                   
+                    
                     if ($value['payment_status'] == 0) {
                         $dataList[$key]['paymentStatus'] = "Pending";
                     } else if ($value['payment_status'] == 1) {

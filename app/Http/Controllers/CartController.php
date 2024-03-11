@@ -142,7 +142,8 @@ class CartController extends Controller
                     $product_info = $this->Product->find_by_id($value['product_id']);
                     $resell_info = $this->ResellProduct->find_by_pid_and_sid($selelr_info->id, $value['product_id']);
                     $category_info = $this->Category->find_by_id($product_info['category']);
-                    
+
+                    $dataList[$key]['CartID'] = $value['id'];
                     $dataList[$key]['productId'] = $value['product_id'];
                     $dataList[$key]['productName'] = $product_info['product_name'];
                     $dataList[$key]['image'] = $file_server_path . "images/" . json_decode($product_info['images'])->image0;
@@ -195,28 +196,42 @@ class CartController extends Controller
         }
     }
 
-    public function removeCartItemById(Request $requerst) {
-
-        $requerst_token = (is_null($requerst->token) || empty($requerst->tokoen)) ? "" : $requerst->token;
-        $id = (is_null($requerst->id) || empty($requerst->id)) ? "" : $requerst->id;
-
-        if ($requerst_token == "") {
+    public function removeCartItemById(Request $request) {
+        
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+        $CardRID = (is_null($request->CardRID) || empty($request->CardRID)) ? "" : $request->CardRID;
+        if ($request_token == "") {
             return $this->AppHelper->responseMessageHandle(0, "Token is required.");
-        } else if ($id == "") {
-            return $this->AppHelper->responseMessageHandle(0, "Product Id is required");
-        } else {
+        } else if ($CardRID == "") {
+            return $this->AppHelper->responseMessageHandle(0, "ProductId is required.");
+        } else 
+        {
+            try {     
+                $CID = CartItem::where('id', $CardRID)->pluck('cart_id');          
+                $amount = CartItem::where('id', $CardRID)->value('total');
+                $totalcart = Cart::where('id', $CID)->value("cart_total");
+                
+                // UpdateCart
+               
+                $updatedTotalCart = $totalcart - $amount;
+                $update_cart = Cart::where('id', $CID)->update(['cart_total' => $updatedTotalCart]);
 
-            try {
-                $resp = $this->Cart->remove_product_from_cart_by_id($id); 
-
-                if ($resp) {
-                    return $this->AppHelper->responseMessageHandle(1, "Operation Complete");
-                } else { 
-                    return $this->AppHelper->responseMessageHandle(0, "Error Occured");
+            
+                // Delete from cart item table
+                $delete_from_cartitem = CartItem::where('id', '=', $CardRID)->delete();
+            
+                if (!empty($delete_from_cartitem)) {
+                    return $this->AppHelper->responseMessageHandle(1, "Successfully removed the product.");
+                   
+                } else {
+                    return $this->AppHelper->responseMessageHandle(0, "Failed to delete the product. Please try again later");
                 }
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
+            
+            
         }
     }
+    
 }

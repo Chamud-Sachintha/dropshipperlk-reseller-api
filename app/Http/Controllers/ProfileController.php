@@ -4,17 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
 use App\Models\Reseller;
+use App\Models\BankDetails;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
     private $AppHelper;
     private $Reseller;
+    private $BankDetails;
 
     public function __construct()
     {
         $this->AppHelper = new AppHelper();
         $this->Reseller = new Reseller();
+        $this->BankDetails = new  BankDetails();
     }
 
     public function getSellerProfileInfo(Request $request) {
@@ -27,6 +30,7 @@ class ProfileController extends Controller
 
             try {
                 $resp = $this->Reseller->find_by_token($request_token);
+                $respBankData = $this->BankDetails->find_id($resp->id);
 
                 $profileData = array();
 
@@ -38,6 +42,10 @@ class ProfileController extends Controller
                     $profileData['phoneNumber'] = $resp['phone_number'];
                     $profileData['nicNumber'] = $resp['nic_number'];
                     $profileData['email'] = $resp['email'];
+                    $profileData['bank_name'] = $respBankData['bank_name'] ?? '';
+                    $profileData['account_number'] = $respBankData['account_number'] ?? '';
+                    $profileData['resellr_name'] = $respBankData['resellr_name'] ?? '';
+                    $profileData['branch_code'] = $respBankData['branch_code'] ?? '';
 
                     return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $profileData);
                 } else {

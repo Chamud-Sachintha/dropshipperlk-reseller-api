@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfitShareController;
 use App\Http\Controllers\ResellerController;
 use App\Http\Controllers\ResellProductController;
+use App\Http\Controllers\BankDetailsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,10 +36,14 @@ Route::post('login', [AuthController::class, 'authenticateUser']);
 Route::middleware('authToken')->post('add-kyc-info', [KYCController::class, 'addKYCInformation']);
 Route::middleware('authToken')->post('get-profile-data', [ProfileController::class, 'getSellerProfileInfo']);
 
+Route::middleware('authToken')->post('update-bank-dtails', [BankDetailsController::class, 'UpdateBankInfo']);
+Route::middleware('authToken')->post('update-edit-bank-dtails', [BankDetailsController::class, 'UpdateEditBankInfo']);
+
 Route::middleware('authToken')->post('get-all-products', [ProductController::class, 'getAllProductList']);
 Route::middleware('authToken')->post('get-product-info', [ProductController::class, 'getProductInfoByProductId']);
 Route::middleware('authToken')->post('resell-product', [ResellProductController::class, 'addNewResellProduct']);
 Route::middleware('authToken')->post('get-resell-product-list', [ResellProductController::class, 'getAllResellProducts']);
+Route::middleware('authToken')->post('get-productDelivery-info', [ProductController::class, 'getAllResellProductsDeliverycharg']);
 
 Route::middleware('authToken')->post('place-order', [OrderController::class, 'placeNewOrderRequest']);
 Route::middleware('authToken')->post('get-order-list', [OrderController::class, 'getOrderList']);
@@ -52,6 +57,7 @@ Route::middleware('authToken')->post('get-team', [ResellerController::class, 'ge
 Route::middleware('authToken')->post('add-to-cart', [CartController::class, 'addCartProduct']);
 Route::middleware('authToken')->post('get-cart-items-count', [CartController::class, 'getCartItemsCount']);
 Route::middleware('authToken')->post('get-cart-items-list', [CartController::class, 'getCartItems']);
+Route::middleware('authToken')->post('get-cart-items-list-remove', [CartController::class, 'removeCartItemById']);
 
 Route::middleware('authToken')->post('place-order-by-cart', [OrderEnController::class, 'placeNewOrder']);
 Route::middleware('authToken')->post('remove-product-from-list', [ResellProductController::class, 'removeResellProduct']);
