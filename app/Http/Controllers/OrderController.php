@@ -48,6 +48,7 @@ class OrderController extends Controller
         $paymentMethod = (is_null($request->paymentMethod) || empty($request->paymentMethod)) ? "" : $request->paymentMethod;
         $quantity = (is_null($request->quantity) || empty($request->quantity)) ? "" : $request->quantity;
         $bankSlip = (is_null($request->bankSlip) || empty($request->bankSlip)) ? "" : $request->bankSlip;
+        $FinalTotal = (is_null($request->FinalTotal) || empty($request->FinalTotal)) ? "" : $request->FinalTotal;
 
         if ($request_token == "") {
             return $this->AppHelper->responseMessageHandle(0, "Token is required.");
@@ -73,12 +74,12 @@ class OrderController extends Controller
                 $reseller = $this->Reseller->find_by_token($request_token);
                 $product = $this->Product->find_by_id($productId);
                 $resell_product = $this->ResellProduct->find_by_pid_and_sid($reseller->id, $productId);
-
+                $orderId = $this->AppHelper->generate_ref(10);
                 if ($product) {
                     $orderInfo = array();
                     $orderInfo['productId'] = $productId;
                     $orderInfo['resellerId'] = $reseller->id;
-                    $orderInfo['order'] = $this->AppHelper->generate_ref(10);
+                    $orderInfo['order'] =  $orderId;
                     $orderInfo['name'] = $name;
                     $orderInfo['address'] = $address;
                     $orderInfo['city'] = $city;
@@ -99,6 +100,25 @@ class OrderController extends Controller
                     $orderInfo['createTime'] = $this->AppHelper->get_date_and_time();
 
                     $order = $this->Order->add_log($orderInfo);
+//Order En
+                    $orderInfo = array();
+                    $order_number =  $orderId;
+
+                    $orderInfo['resellerId'] = $reseller->id;
+                    $orderInfo['order'] = $order_number;
+                    $orderInfo['totalAmount'] = $resell_product['price'] * $quantity;
+                    $orderInfo['paymentMethod'] = $paymentMethod;
+                   
+                    if ($bankSlip != "") {
+                        $orderInfo['bankSlip'] = $this->AppHelper->decodeImage($bankSlip);
+                    } else {
+                        $orderInfo['bankSlip'] = null;
+                    }
+
+                    $orderInfo['isResellerCompleted'] = 0;
+                    $orderInfo['createTime'] = $this->AppHelper->get_date_and_time();
+
+                    $create_order = $this->OrderEn->add_log($orderInfo);
 
                     if ($order) {
                         return $this->AppHelper->responseMessageHandle(1, "Operation Complete");

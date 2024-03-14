@@ -44,6 +44,7 @@ Route::middleware('authToken')->post('get-product-info', [ProductController::cla
 Route::middleware('authToken')->post('resell-product', [ResellProductController::class, 'addNewResellProduct']);
 Route::middleware('authToken')->post('get-resell-product-list', [ResellProductController::class, 'getAllResellProducts']);
 Route::middleware('authToken')->post('get-productDelivery-info', [ProductController::class, 'getAllResellProductsDeliverycharg']);
+Route::middleware('authToken')->post('get-productDelivery-infoPID', [ProductController::class, 'getAllResellProductsDeliverychargProId']);
 
 Route::middleware('authToken')->post('place-order', [OrderController::class, 'placeNewOrderRequest']);
 Route::middleware('authToken')->post('get-order-list', [OrderController::class, 'getOrderList']);

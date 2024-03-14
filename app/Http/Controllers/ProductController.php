@@ -156,6 +156,34 @@ class ProductController extends Controller
         }
     }
 
+    public function getAllResellProductsDeliverychargProId(Request $request){
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+       
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        }
+        else 
+        {
+           
+           try {    
+                    $dataList = array();
+                    $productIds = $request->productId;
+                    $totalWeight = Product::where('id', $productIds)->pluck('weight')->first();
+                    $in_colombo_fees = $this->getCourierCharge(true, $totalWeight);
+                    $out_of_colombo_fees = $this->getCourierCharge(false, $totalWeight);
+                    $dataList['in_colombo_charges'] = $in_colombo_fees;
+                    $dataList['out_of_colombo_charges'] = $out_of_colombo_fees;
+                    return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+                  
+               
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+            
+            
+        }
+    }
+
     private function getCourierCharge($is_colombo, $product_weight) {
 
         $default_charge = 300;
