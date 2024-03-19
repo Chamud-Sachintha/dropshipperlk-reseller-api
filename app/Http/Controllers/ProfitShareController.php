@@ -41,9 +41,16 @@ class ProfitShareController extends Controller
                 $dataList = array();
                 foreach ($resp as $key => $value) {
                     $product_info = $this->Product->find_by_id($value['product_id']);
-                    // $order_info = $this->Order->find_by_id($value['order_id']);
+                    if($value['order_id'] != 0){
+                        $order_info = $this->Order->find_by_id($value['order_id']);
+                        $dataList[$key]['orderNumber'] =  $order_info['order'];
+                    }
+                    else{
+                        
+                        $dataList[$key]['orderNumber'] =  "-";
+                    }
 
-                    $dataList[$key]['orderNumber'] = $value['order_id'];
+                   
 
                     if ($value['product_id'] != 0) {
                         $dataList[$key]['productName'] = $product_info['product_name'];

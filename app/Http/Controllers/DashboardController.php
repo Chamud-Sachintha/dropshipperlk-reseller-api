@@ -54,4 +54,18 @@ class DashboardController extends Controller
         }
 
     }
+
+    public function Getuserdata(Request $request){
+        
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else {
+            $userdata =  $this->Reseller->find_by_token( $request_token);
+            $UserName = $userdata['full_name'];
+            return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $UserName);
+        }
+
+    }
 }

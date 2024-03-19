@@ -33,6 +33,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register', [AuthController::class, 'registerNewReseller']);
 Route::post('login', [AuthController::class, 'authenticateUser']);
 
+
+Route::middleware('authToken')->post('user-data', [DashboardController::class, 'Getuserdata']);
 Route::middleware('authToken')->post('add-kyc-info', [KYCController::class, 'addKYCInformation']);
 Route::middleware('authToken')->post('get-profile-data', [ProfileController::class, 'getSellerProfileInfo']);
 

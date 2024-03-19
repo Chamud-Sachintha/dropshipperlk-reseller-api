@@ -106,7 +106,7 @@ class OrderController extends Controller
 
                     $orderInfo['resellerId'] = $reseller->id;
                     $orderInfo['order'] = $order_number;
-                    $orderInfo['totalAmount'] = $resell_product['price'] * $quantity;
+                    $orderInfo['totalAmount'] = $FinalTotal;
                     $orderInfo['paymentMethod'] = $paymentMethod;
                    
                     if ($bankSlip != "") {
