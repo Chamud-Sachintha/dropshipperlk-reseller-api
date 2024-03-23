@@ -286,6 +286,10 @@ class OrderController extends Controller
 
             // try {
                 $order_info = $this->Order->get_order_by_order_number_new($orderNumber);
+                $order_name = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('name')->first();
+                $order_address = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('address')->first();
+                $order_contact_1 = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('contact_1')->first();
+                $order_contact_2 = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('contact_2')->first();
 
                 $direct_commision = 0;
                 $team_commision = 0;
@@ -299,10 +303,17 @@ class OrderController extends Controller
                     $dataList[$key]['resellPrice'] = $resell_info['price'];
                     $dataList[$key]['quantity'] = $value['quantity'];
                     $dataList[$key]['totalAmount'] = $value['total_amount'];
+                   
 
                     $direct_commision += $product_info['direct_commision'];
                     $team_commision += $product_info['team_commision'];
                 }
+
+              
+                $dataList['resellname'] = $order_name; 
+                $dataList['reselladdress'] = $order_address;
+                $dataList['resellcontact_1'] = $order_contact_1;
+                $dataList['resellcontact_2'] = $order_contact_2;
 
                 $order_info = $this->OrderEn->getOrderInfoByOrderNumber($orderNumber);
 
