@@ -42,6 +42,7 @@ Route::middleware('authToken')->post('update-bank-dtails', [BankDetailsControlle
 Route::middleware('authToken')->post('update-edit-bank-dtails', [BankDetailsController::class, 'UpdateEditBankInfo']);
 
 Route::middleware('authToken')->post('get-all-products', [ProductController::class, 'getAllProductList']);
+Route::middleware('authToken')->post('get-CId-products', [ProductController::class, 'getCIDProductList']);
 Route::middleware('authToken')->post('get-product-info', [ProductController::class, 'getProductInfoByProductId']);
 Route::middleware('authToken')->post('resell-product', [ResellProductController::class, 'addNewResellProduct']);
 Route::middleware('authToken')->post('get-resell-product-list', [ResellProductController::class, 'getAllResellProducts']);

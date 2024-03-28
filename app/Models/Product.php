@@ -30,6 +30,12 @@ class Product extends Model
         return $this->where($map)->first();
     }
 
+    public function find_by_Cid($pid) {
+        $map['category'] = $pid;
+
+        return $this->where($map)->get();
+    }
+
     public function get_all_products() {
         return $this->all();
     }

@@ -42,6 +42,7 @@ class ProductController extends Controller
 
             try {
                 $resp = $this->Product->get_all_products();
+                $AllCategory = Category::get();
 
                 $dataList = array();
                 foreach ($resp as $key => $value) {
@@ -54,9 +55,10 @@ class ProductController extends Controller
                     $dataList[$key]['price'] = $value['price'];
                     $dataList[$key]['images'] = json_decode($value['images'])->image0;
                     $dataList[$key]['createTime'] = $value['create_time'];
-                }
 
-                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+                }
+                
+                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList, $AllCategory);
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
@@ -203,5 +205,40 @@ class ProductController extends Controller
         }
 
         return $default_charge;
+    }
+
+    public function getCIDProductList(Request $request){
+
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else {
+
+            try {
+                $resp = $this->Product->find_by_Cid($request->Cid);
+                $AllCategory = Category::get();
+
+
+                $dataList = array();
+                foreach ($resp as $key => $value) {
+                    $category = $this->Category->find_by_id($value['category']);
+
+                    $dataList[$key]['id'] = $value['id'];
+                    $dataList[$key]['productName'] = $value['product_name'];
+                    $dataList[$key]['categoryName'] = $category->category_name;
+                    $dataList[$key]['description'] = $value['description'];
+                    $dataList[$key]['price'] = $value['price'];
+                    $dataList[$key]['images'] = json_decode($value['images'])->image0;
+                    $dataList[$key]['createTime'] = $value['create_time'];
+
+                }
+                
+                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList, $AllCategory);
+                
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
     }
 }
