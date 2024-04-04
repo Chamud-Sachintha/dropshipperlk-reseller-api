@@ -190,8 +190,12 @@ class OrderController extends Controller
                         $dataList[$key]['orderStatus'] = "Cancle";
                     } else if ($value['order_status'] == 4) {
                         $dataList[$key]['orderStatus'] = "In Courier";
-                    } else {
+                    } else if ($value['order_status'] == 5) {
                         $dataList[$key]['orderStatus'] = "Delivered";
+                    }else if ($value['order_status'] == 6) {
+                        $dataList[$key]['orderStatus'] = "Returned";
+                    } else {
+                        $dataList[$key]['orderStatus'] = "Complted";
                     }
 
                      $dateTime = new DateTime($value['created_at']);
