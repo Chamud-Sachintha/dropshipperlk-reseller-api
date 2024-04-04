@@ -32,15 +32,15 @@ class DashboardController extends Controller
         $seller_info = $this->Reseller->find_by_token($request->token);
 
         if ($seller_info) {
-            $pending_orders = $this->Orders->get_pending_count_by_seller($seller_info['id']);
-            $in_courier_orders = $this->Orders->get_in_courier_count_by_seller($seller_info['id']);
-            $complete_corders = $this->Orders->get_complete_count_by_seller($seller_info['id']);
-            $delivered_corders = $this->Orders->get_pending_count($seller_info['id']);
-            $total_orders = $this->Orders->get_total_orders($seller_info['id']);
-            $cancle_orders = $this->Orders->get_camcle_count_by_seller($seller_info['id']);
-            $paid_orders = $this->Orders->get_paid_order_count($seller_info['id']);
+            $pending_orders = $this->OrderEn->get_pending_count_by_seller($seller_info['id']);
+            $in_courier_orders = $this->OrderEn->get_in_courier_count_by_seller($seller_info['id']);
+            $complete_corders = $this->OrderEn->get_complete_count_by_seller($seller_info['id']);
+            $delivered_corders = $this->OrderEn->get_pending_count($seller_info['id']);
+            $total_orders = $this->OrderEn->get_total_orders($seller_info['id']);
+            $cancle_orders = $this->OrderEn->get_camcle_count_by_seller($seller_info['id']);
+            $paid_orders = $this->OrderEn->get_paid_order_count($seller_info['id']);
             $received_earnings = $this->ProfitShareLog->get_total_earnings($seller_info['id']);
-            $pending_payment = $this->Orders->get_pending_payment($seller_info['id']);
+            $pending_payment = $this->OrderEn->get_pending_payment($seller_info['id']);
 
             $dataList['pendingOrderCount'] = $pending_orders;
             $dataList['inCourierOrderCount'] = $in_courier_orders;
