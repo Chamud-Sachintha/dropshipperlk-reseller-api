@@ -31,7 +31,8 @@ class DashboardController extends Controller
         if ($seller_info) {
             $pending_orders = $this->Orders->get_pending_count_by_seller($seller_info['id']);
             $in_courier_orders = $this->Orders->get_in_courier_count_by_seller($seller_info['id']);
-            $delivered_corders = $this->Orders->get_complete_count_by_seller($seller_info['id']);
+            $complete_corders = $this->Orders->get_complete_count_by_seller($seller_info['id']);
+            $delivered_corders = $this->Orders->get_pending_count($seller_info['id']);
             $total_orders = $this->Orders->get_total_orders($seller_info['id']);
             $cancle_orders = $this->Orders->get_camcle_count_by_seller($seller_info['id']);
             $paid_orders = $this->Orders->get_paid_order_count($seller_info['id']);
@@ -40,12 +41,13 @@ class DashboardController extends Controller
 
             $dataList['pendingOrderCount'] = $pending_orders;
             $dataList['inCourierOrderCount'] = $in_courier_orders;
-            $dataList['completeOrderCount'] = $delivered_corders;
+            $dataList['completeOrderCount'] = $complete_corders;
             $dataList['totalOrders'] = $total_orders;
             $dataList['cancleOrders'] = $cancle_orders;
             $dataList['paidOrders'] = $paid_orders;
             $dataList['totalEarnigs'] = $received_earnings;
             $dataList['pendingPayment'] = $pending_payment;
+            $dataList['Deleriverd'] = $delivered_corders;
             $dataList['refCode'] = $seller_info['code'];
 
             return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);

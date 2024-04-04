@@ -55,4 +55,60 @@ class OrderEn extends Model
         return $this->where($map)->whereNotIn('order_status', [5])->get();
 
     }
+
+    public function get_pending_count_by_seller($seller) {
+        $map['reseller_id'] = $seller;
+        $map['order_status'] = 0;
+
+        return $this->where($map)->count();
+    }
+
+    public function get_in_courier_count_by_seller($seller) {
+        $map['reseller_id'] = $seller;
+        $map['order_status'] = 4;
+
+        return $this->where($map)->count();
+    }
+
+    public function get_complete_count_by_seller($seller) {
+        $map['reseller_id'] = $seller;
+        $map['order_status'] = 7;
+
+        return $this->where($map)->count();
+    }
+
+    public function get_camcle_count_by_seller($seller) {
+        $map['reseller_id'] = $seller;
+        $map['order_status'] = 3;
+
+        return $this->where($map)->count();
+    }
+
+    public function get_paid_order_count($seller) {
+        $map['reseller_id'] = $seller;
+        $map['payment_status'] = 1;
+        $map['order_status'] = 5;
+
+        return $this->where($map)->count();
+    }
+
+    public function get_total_orders($seller) {
+        $map['reseller_id'] = $seller;
+
+        return $this->where($map)->count();
+    }
+
+    public function get_pending_payment($seller) {
+        $map['reseller_id'] = $seller;
+        $map['payment_status'] = 0;
+
+        return $this->where($map)->sum("total_amount");
+    }
+
+    public function get_pending_count() {
+        $map['reseller_id'] = $seller;
+        $map['order_status'] = 5;
+
+        return $this->where($map)->count();
+    }
 }
