@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\ProfitShare;
 use App\Models\Reseller;
 use Illuminate\Http\Request;
+use App\Models\OrderEn;
 
 class DashboardController extends Controller
 {
@@ -14,6 +15,7 @@ class DashboardController extends Controller
     private $Orders;
     private $Reseller;
     private $ProfitShareLog;
+    private $OrderEn;
     
     public function __construct()
     {   
@@ -21,6 +23,7 @@ class DashboardController extends Controller
         $this->Reseller = new Reseller();
         $this->Orders = new Order();
         $this->ProfitShareLog = new ProfitShare();
+        $this->OrderEn = new  OrderEn();
     }
 
     public function getDashboardData(Request $request) {
