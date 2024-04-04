@@ -97,13 +97,8 @@ class ProductController extends Controller
                     $dataList['directCommision'] = $resp['direct_commision'];
                     $dataList['images']= json_decode($resp->images);
                     $dataList['Stock']= $resp['stock_count'];
-
-                    if ($resp['status'] == 0) {
-                        $dataList['Out of Stock'] = true;
-                    } else {
-                        $dataList['inStock'] = false;
-                    }
-
+                    $dataList['StockStatus'] = $resp['status'];
+                    
                     if ($resel_resp) {
                         $dataList['isResell'] = true;
                     } else {
