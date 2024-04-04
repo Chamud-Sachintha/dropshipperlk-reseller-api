@@ -98,8 +98,8 @@ class ProductController extends Controller
                     $dataList['images']= json_decode($resp->images);
                     $dataList['Stock']= $resp['stock_count'];
 
-                    if ($resp['stock_count'] > 0) {
-                        $dataList['inStock'] = true;
+                    if ($resp['status'] == 0) {
+                        $dataList['Out of Stock'] = true;
                     } else {
                         $dataList['inStock'] = false;
                     }
