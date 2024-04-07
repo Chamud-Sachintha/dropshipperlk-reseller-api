@@ -172,4 +172,32 @@ class ResellProductController extends Controller
             // }
         }
     }
+
+    public function updatePriceResellProduct(Request $request){
+            $request_token = $request->input('token');
+            $productId = $request->input('productId');
+            $productPrice = $request->input('URprice');
+
+            if (empty($request_token)) {
+                return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+            } elseif (empty($productId)) {
+                return $this->AppHelper->responseMessageHandle(0, "Product ID is required.");
+            } elseif (!is_numeric($productPrice)) {
+                return $this->AppHelper->responseMessageHandle(0, "Invalid Product Price.");
+            }
+
+            $reseller = $this->Reseller->find_by_token($request_token);
+
+            if (!$reseller) {
+                return $this->AppHelper->responseMessageHandle(0, "Invalid Token.");
+            }
+
+            $resp = $this->ResellProduct->Update_Price($reseller->id, $productId, $productPrice);
+
+            if ($resp) {
+                return $this->AppHelper->responseMessageHandle(1, "Price updated successfully.");
+            } else {
+                return $this->AppHelper->responseMessageHandle(0, "Failed to update price.");
+            }
+    }
 }

@@ -46,4 +46,11 @@ class ResellProduct extends Model
 
         return $this->where($map)->get();
     }
+
+    public function Update_Price($sid,$productId,$productPrice){
+        $map['reseller_id'] = $sid;
+        $map['product_id'] = $productId;
+    
+        return $this->where($map)->update(['price' => $productPrice]);
+    }
 }

@@ -66,4 +66,5 @@ Route::middleware('authToken')->post('get-cart-items-list-remove', [CartControll
 
 Route::middleware('authToken')->post('place-order-by-cart', [OrderEnController::class, 'placeNewOrder']);
 Route::middleware('authToken')->post('remove-product-from-list', [ResellProductController::class, 'removeResellProduct']);
+Route::middleware('authToken')->post('update-product-from-price', [ResellProductController::class, 'updatePriceResellProduct']);
 Route::middleware('authToken')->post('get-cart-total', [CartController::class, 'getCartTotalAmount']);
