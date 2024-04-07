@@ -172,10 +172,10 @@ class AuthController extends Controller
 
         try {
             $resp = $this->Reseller->get_count_by_ref_code($refCode);
-
-            if ($resp == 3) {
+            $isLimitOk = true;
+            /*if ($resp == 3) {
                 $isLimitOk = false;
-            }
+            }*/
         } catch (\Exception $e) {
             return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
         }
