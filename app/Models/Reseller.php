@@ -81,4 +81,13 @@ class Reseller extends Model
 
         return $this->where($map)->first();
     }
+
+    public function update_password($userId ,$userPass)
+    {
+        //$map['id'] = $userId;
+        $map['password'] = $userPass;
+
+        return $this->where(array('id' => $userId))->update($map);
+
+    }
 }

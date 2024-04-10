@@ -32,6 +32,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('register', [AuthController::class, 'registerNewReseller']);
 Route::post('login', [AuthController::class, 'authenticateUser']);
+Route::middleware('authToken')->post('update-reseller-password', [AuthController::class, 'UpdateResellerPassword']);
 
 
 Route::middleware('authToken')->post('user-data', [DashboardController::class, 'Getuserdata']);

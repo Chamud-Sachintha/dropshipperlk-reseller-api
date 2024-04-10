@@ -183,5 +183,37 @@ class AuthController extends Controller
         return $isLimitOk;
     }
 
+    public function UpdateResellerPassword(Request $request){
+
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+        $NewPassword = (is_null($request->NewPassword) || empty($request->NewPassword)) ? "" : $request->NewPassword;
+
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        }else if($NewPassword == ""){
+            return $this->AppHelper->responseMessageHandle(0, "New Password is required.");
+        }
+         else {
+
+            try {
+                $seller_info = $this->Reseller->find_by_token($request_token);
+                if(empty($seller_info)){
+                    throw new \Exception("Invalid token.", 0);
+                }
+                else{
+                    $userPass =  Hash::make($NewPassword);
+                    $userId = $seller_info['id'];
+                    $donechane = $this->Reseller->update_password( $userId ,$userPass);
+                }
+
+                      
+                return $this->AppHelper->responseMessageHandle(1, "Operation Complete");
+                       
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
+    }
+
     
 }
