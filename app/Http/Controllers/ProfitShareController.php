@@ -34,7 +34,7 @@ class ProfitShareController extends Controller
             return $this->AppHelper->responseMessageHandle(0, "Token is required");
         } else {
 
-            // try {
+          //   try {
                 $seller_info = $this->Reseller->find_by_token($request_token);
                 $resp = $this->ProfitShareLog->get_log_by_seller($seller_info['id']);
 
@@ -53,7 +53,8 @@ class ProfitShareController extends Controller
                    
 
                     if ($value['product_id'] != 0) {
-                        $dataList[$key]['productName'] = $product_info['product_name'];
+                      //  $dataList[$key]['productName'] = $product_info['product_name'];
+                      $dataList[$key]['productName'] = $product_info['product_name'];
                     } else {
                         $dataList[$key]['productName'] = 0;
                     }
@@ -76,7 +77,7 @@ class ProfitShareController extends Controller
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
             // } catch (\Exception $e) {
             //     return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
-            // }
+        // }
         }
     }
 }
