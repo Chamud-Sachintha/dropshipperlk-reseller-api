@@ -53,7 +53,13 @@ class ProductController extends Controller
                     $dataList[$key]['categoryName'] = $category->category_name;
                     $dataList[$key]['description'] = $value['description'];
                     $dataList[$key]['price'] = $value['price'];
+                    $decodedImages = json_decode($value['images']);
+                    if ($decodedImages && isset($decodedImages->image0) && !empty($decodedImages->image0)){
                     $dataList[$key]['images'] = json_decode($value['images'])->image0;
+                    }
+                    else{
+                        $dataList[$key]['image'] = '';
+                    }
                     $dataList[$key]['createTime'] = $value['create_time'];
 
                 }
