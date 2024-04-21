@@ -93,6 +93,7 @@ class ProductController extends Controller
                     $dataList['description'] = $resp['description'];
                     $dataList['price'] = $resp['price'];
                     $dataList['waranty'] = $resp['waranty'];
+                    $dataList['is_store_pick'] = $resp['is_store_pick'];
                     $dataList['teamCommision'] = $resp['team_commision'];
                     $dataList['directCommision'] = $resp['direct_commision'];
                     $dataList['images']= json_decode($resp->images);
