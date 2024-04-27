@@ -92,7 +92,7 @@ class BankDetailsController extends Controller
             {
                 $bankdata =array();
                 $bankdata['bank_name']=$request->BankName;
-                $bankdata['account_number']= (int)$request->AccountNumber;
+                $bankdata['account_number']= $request->AccountNumber;
                 $bankdata['branch_code']=$request->BranchCode;
                 $bankdata['resellr_name']=$request->Name;
                 $bankdata['createTime'] = $this->AppHelper->get_date_and_time();
