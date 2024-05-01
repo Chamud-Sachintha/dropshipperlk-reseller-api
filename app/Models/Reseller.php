@@ -90,4 +90,14 @@ class Reseller extends Model
         return $this->where(array('id' => $userId))->update($map);
 
     }
+
+    public function update_by_token($sellerid,$profileData){
+        $map['full_name'] = $profileData['fullName'];
+        $map['b_name'] = $profileData['buisnessName'];
+        $map['address'] = $profileData['address'];
+        $map['email'] = $profileData['email'];
+
+        return $this->where(array('id' => $sellerid))->update($map);
+
+    }
 }

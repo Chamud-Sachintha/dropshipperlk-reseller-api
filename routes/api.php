@@ -38,6 +38,7 @@ Route::middleware('authToken')->post('update-reseller-password', [AuthController
 Route::middleware('authToken')->post('user-data', [DashboardController::class, 'Getuserdata']);
 Route::middleware('authToken')->post('add-kyc-info', [KYCController::class, 'addKYCInformation']);
 Route::middleware('authToken')->post('get-profile-data', [ProfileController::class, 'getSellerProfileInfo']);
+Route::middleware('authToken')->post('update-Profile-dtails', [ProfileController::class, 'updateProfileData']);
 
 Route::middleware('authToken')->post('update-bank-dtails', [BankDetailsController::class, 'UpdateBankInfo']);
 Route::middleware('authToken')->post('update-edit-bank-dtails', [BankDetailsController::class, 'UpdateEditBankInfo']);

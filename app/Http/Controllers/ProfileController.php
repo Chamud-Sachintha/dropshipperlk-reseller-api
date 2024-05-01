@@ -58,6 +58,36 @@ class ProfileController extends Controller
     }
 
     public function updateProfileData(Request $request) {
+        $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
+        $fullName = (is_null($request->fullName) || empty($request->fullName)) ? "" : $request->fullName;
+        $address = (is_null($request->address) || empty($request->address)) ? "" : $request->address;
+        $buisnessName = (is_null($request->buisnessName) || empty($request->buisnessName)) ? "" : $request->buisnessName;
+        $email = (is_null($request->email) || empty($request->email)) ? "" : $request->email;
 
+        if ($request_token == "") {
+            return $this->AppHelper->responseMessageHandle(0, "Token is required.");
+        } else {
+            try {
+                $resp = $this->Reseller->find_by_token($request_token);
+                $sellerid = $resp['id'];
+
+                $profileData = array();
+                   
+                    $profileData['fullName'] = $fullName;
+                    $profileData['address'] = $address;
+                    $profileData['buisnessName'] = $buisnessName;
+                    $profileData['email'] = $email;
+
+                    $updated = $this->Reseller->update_by_token($sellerid,$profileData);
+                if( $updated){
+                   
+                    return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $updated);
+                } else {
+                    return $this->AppHelper->responseMessageHandle(0, "There is No Profile data.");
+                }
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
+        }
     }
 }
