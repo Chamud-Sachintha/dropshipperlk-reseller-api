@@ -99,6 +99,7 @@ class ResellProductController extends Controller
                     $dataList[$key]['categoryName'] = $category_info->category_name;
                     $dataList[$key]['description'] = substr($product_info['description'], 0, 40) . "...";
                     $dataList[$key]['price'] = $product_info['price'];
+                    $dataList[$key]['Pstatus'] = $product_info['status'];
             
                     if ($value['status'] == 1) {
                         $dataList[$key]['status'] = "Active";
