@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfitShareController;
 use App\Http\Controllers\ResellerController;
 use App\Http\Controllers\ResellProductController;
 use App\Http\Controllers\BankDetailsController;
+use App\Http\Controllers\CityListController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -70,3 +71,5 @@ Route::middleware('authToken')->post('place-order-by-cart', [OrderEnController::
 Route::middleware('authToken')->post('remove-product-from-list', [ResellProductController::class, 'removeResellProduct']);
 Route::middleware('authToken')->post('update-product-from-price', [ResellProductController::class, 'updatePriceResellProduct']);
 Route::middleware('authToken')->post('get-cart-total', [CartController::class, 'getCartTotalAmount']);
+
+Route::middleware('authToken')->post('get-city-list', [CityListController::class, 'getAllCityList']);
