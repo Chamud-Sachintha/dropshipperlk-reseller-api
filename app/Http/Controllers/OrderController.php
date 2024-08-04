@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
 use App\Models\Category;
+use App\Models\InCourierDetail;
 use App\Models\Order;
 use App\Models\OrderCancle;
 use App\Models\OrderEn;
@@ -23,6 +24,7 @@ class OrderController extends Controller
     private $Category;
     private $OrderCancleLog;
     private $OrderEn;
+    private $InCourierInfo;
 
     public function __construct()
     {
@@ -34,9 +36,11 @@ class OrderController extends Controller
         $this->Category = new Category();
         $this->OrderCancleLog = new OrderCancle();
         $this->OrderEn = new  OrderEn();
+        $this->InCourierInfo = new InCourierDetail();
     }
 
-    public function placeNewOrderRequest(Request $request) {
+    public function placeNewOrderRequest(Request $request)
+    {
 
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
         $productId = (is_null($request->pid) || empty($request->pid)) ? "" : $request->pid;
@@ -90,18 +94,18 @@ class OrderController extends Controller
                     $orderInfo['quantity'] = $quantity;
                     $orderInfo['totalAmount'] = $resell_product['price'] * $quantity;
                     $orderInfo['paymentMethod'] = $paymentMethod;
-                    
+
                     if ($bankSlip != "") {
                         $orderInfo['bankSlip'] = $this->AppHelper->decodeImage($bankSlip);
                     } else {
                         $orderInfo['bankSlip'] = null;
                     }
-                    
+
                     $orderInfo['isResellerCompleted'] = 0;
                     $orderInfo['createTime'] = $this->AppHelper->get_date_and_time();
 
                     $order = $this->Order->add_log($orderInfo);
-//Order En
+                    //Order En
                     $orderInfo = array();
                     $order_number =  $orderId;
 
@@ -109,7 +113,7 @@ class OrderController extends Controller
                     $orderInfo['order'] = $order_number;
                     $orderInfo['totalAmount'] = $FinalTotal;
                     $orderInfo['paymentMethod'] = $paymentMethod;
-                   
+
                     if ($bankSlip != "") {
                         $orderInfo['bankSlip'] = $this->AppHelper->decodeImage($bankSlip);
                     } else {
@@ -133,7 +137,8 @@ class OrderController extends Controller
         }
     }
 
-    public function getOrderList(Request $request) {
+    public function getOrderList(Request $request)
+    {
 
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
 
@@ -152,6 +157,7 @@ class OrderController extends Controller
 
                     $product_info = $this->Product->find_by_id($value['product_id']);
                     $resell_info = $this->ResellProduct->find_by_pid_and_sid($value['reseller_id'], $value['product_id']);
+                    $incourierDetails = $this->InCourierInfo->find_by_order($value['order']);
 
                     $dataList[$key]['orderNumber'] = $value['order'];
                     // $dataList[$key]['productName'] = $product_info['product_name'];
@@ -159,19 +165,20 @@ class OrderController extends Controller
                     // $dataList[$key]['resellPrice'] = $resell_info['price'];
                     // $dataList[$key]['quantity'] = $value['quantity'];
                     $dataList[$key]['totalAmount'] = $value['total_amount'];
-                    
-                    if ( $value['tracking_number'] == "") {
+
+                    if ($incourierDetails['way_bill']) {
+                        $dataList[$key]['TrackingNumber'] = $incourierDetails['way_bill'];
+                    } else {
                         $dataList[$key]['TrackingNumber'] = "-";
-                    } else {
-                        $dataList[$key]['TrackingNumber'] = $value['tracking_number'];
                     }
-                    if ( $value['courier_name'] == "") {
-                        $dataList[$key]['courierName'] = "-";
-                    } else {
-                        $dataList[$key]['courierName'] = $value['courier_name'];
-                    }
-                   
-                    
+                    // if ( $value['courier_name'] == "") {
+                    //     $dataList[$key]['courierName'] = "-";
+                    // } else {
+                    //     $dataList[$key]['courierName'] = $value['courier_name'];
+                    // }
+
+                    $dataList[$key]['courierName'] = "CeylonEx";
+
                     if ($value['payment_status'] == 0) {
                         $dataList[$key]['paymentStatus'] = "Pending";
                     } else if ($value['payment_status'] == 1) {
@@ -192,14 +199,14 @@ class OrderController extends Controller
                         $dataList[$key]['orderStatus'] = "In Courier";
                     } else if ($value['order_status'] == 5) {
                         $dataList[$key]['orderStatus'] = "Delivered";
-                    }else if ($value['order_status'] == 6) {
+                    } else if ($value['order_status'] == 6) {
                         $dataList[$key]['orderStatus'] = "Returned";
                     } else {
                         $dataList[$key]['orderStatus'] = "Complted";
                     }
 
-                     $dateTime = new DateTime($value['created_at']);
-                     $formattedDate = $dateTime->format('Y-m-d');  
+                    $dateTime = new DateTime($value['created_at']);
+                    $formattedDate = $dateTime->format('Y-m-d');
 
                     $dataList[$key]['orderPlaceDate'] = $formattedDate;
                 }
@@ -211,7 +218,8 @@ class OrderController extends Controller
         }
     }
 
-    public function getOrderInfoByOrderNumber(Request $request) {
+    public function getOrderInfoByOrderNumber(Request $request)
+    {
 
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
         $orderNumber = (is_null($request->orderNumber) || empty($request->orderNumber)) ? "" : $request->orderNumber;
@@ -224,7 +232,7 @@ class OrderController extends Controller
 
             try {
                 $order_info = $this->Order->get_order_by_order_number($orderNumber);
-                
+
                 $dataList = array();
                 if ($order_info) {
 
@@ -282,7 +290,8 @@ class OrderController extends Controller
         }
     }
 
-    public function getOrderInfoListByOrderNumberNew(Request $request) {
+    public function getOrderInfoListByOrderNumberNew(Request $request)
+    {
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
         $orderNumber = (is_null($request->orderNumber) || empty($request->orderNumber)) ? "" : $request->orderNumber;
 
@@ -293,82 +302,83 @@ class OrderController extends Controller
         } else {
 
             // try {
-                $order_info = $this->Order->get_order_by_order_number_new($orderNumber);
-                $order_name = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('name')->first();
-                $order_address = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('address')->first();
-                $order_contact_1 = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('contact_1')->first();
-                $order_contact_2 = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('contact_2')->first();
+            $order_info = $this->Order->get_order_by_order_number_new($orderNumber);
+            $order_name = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('name')->first();
+            $order_address = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('address')->first();
+            $order_contact_1 = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('contact_1')->first();
+            $order_contact_2 = $this->Order->get_order_by_order_number_new($orderNumber)->pluck('contact_2')->first();
 
-                $direct_commision = 0;
-                $team_commision = 0;
-                $dataList = array();
-                foreach ($order_info as $key => $value) {
-                    $product_info = $this->Product->find_by_id($value['product_id']);
-                    $resell_info = $this->ResellProduct->find_by_pid_and_sid($value['reseller_id'], $value['product_id']);
-                    // dd($resell_info['price']);
-                    $dataList[$key]['productName'] = $product_info['product_name'];
-                    $dataList[$key]['productPrice'] = $product_info['price'];
-                    $dataList[$key]['resellPrice'] = $resell_info['price'];
-                    $dataList[$key]['quantity'] = $value['quantity'];
-                    $dataList[$key]['totalAmount'] = $value['total_amount'];
-                   
+            $direct_commision = 0;
+            $team_commision = 0;
+            $dataList = array();
+            foreach ($order_info as $key => $value) {
+                $product_info = $this->Product->find_by_id($value['product_id']);
+                $resell_info = $this->ResellProduct->find_by_pid_and_sid($value['reseller_id'], $value['product_id']);
+                // dd($resell_info['price']);
+                $dataList[$key]['productName'] = $product_info['product_name'];
+                $dataList[$key]['productPrice'] = $product_info['price'];
+                $dataList[$key]['resellPrice'] = $resell_info['price'];
+                $dataList[$key]['quantity'] = $value['quantity'];
+                $dataList[$key]['totalAmount'] = $value['total_amount'];
 
-                    $direct_commision += $product_info['direct_commision'];
-                    $team_commision += $product_info['team_commision'];
-                }
 
-              
-                $dataList['resellname'] = $order_name; 
-                $dataList['reselladdress'] = $order_address;
-                $dataList['resellcontact_1'] = $order_contact_1;
-                $dataList['resellcontact_2'] = $order_contact_2;
+                $direct_commision += $product_info['direct_commision'];
+                $team_commision += $product_info['team_commision'];
+            }
 
-                $order_info = $this->OrderEn->getOrderInfoByOrderNumber($orderNumber);
 
-                if ($order_info['payment_status'] == 0) {
-                    $dataList['paymentStatus'] = "Pending";
-                } else if ($order_info['payment_status'] == 1) {
-                    $dataList['paymentStatus'] = "Paid";
-                } else {
-                    $dataList['paymentStatus'] = "Refunded";
-                }
+            $dataList['resellname'] = $order_name;
+            $dataList['reselladdress'] = $order_address;
+            $dataList['resellcontact_1'] = $order_contact_1;
+            $dataList['resellcontact_2'] = $order_contact_2;
 
-                if ($order_info['order_status'] == 0) {
-                    $dataList['orderStatus'] = "Pending";
-                } else if ($order_info['order_status'] == 1) {
-                    $dataList['orderStatus'] = "Hold";
-                } else if ($order_info['order_status'] == 2) {
-                    $dataList['orderStatus'] = "Packaging";
-                } else if ($order_info['order_status'] == 3) {
-                    $dataList['orderStatus'] = "Cancle";
-                } else if ($order_info['order_status'] == 4) {
-                    $dataList['orderStatus'] = "In Courier";
-                } else {
-                    $dataList['orderStatus'] = "Delivered";
-                }
+            $order_info = $this->OrderEn->getOrderInfoByOrderNumber($orderNumber);
 
-                $dataList['orderCancled'] = 0;
-                $dataList['cancleOrder'] = 0;
+            if ($order_info['payment_status'] == 0) {
+                $dataList['paymentStatus'] = "Pending";
+            } else if ($order_info['payment_status'] == 1) {
+                $dataList['paymentStatus'] = "Paid";
+            } else {
+                $dataList['paymentStatus'] = "Refunded";
+            }
 
-                if ($order_info['order_status'] < 4) {
-                    $dataList['cancleOrder'] = 1;
-                }
+            if ($order_info['order_status'] == 0) {
+                $dataList['orderStatus'] = "Pending";
+            } else if ($order_info['order_status'] == 1) {
+                $dataList['orderStatus'] = "Hold";
+            } else if ($order_info['order_status'] == 2) {
+                $dataList['orderStatus'] = "Packaging";
+            } else if ($order_info['order_status'] == 3) {
+                $dataList['orderStatus'] = "Cancle";
+            } else if ($order_info['order_status'] == 4) {
+                $dataList['orderStatus'] = "In Courier";
+            } else {
+                $dataList['orderStatus'] = "Delivered";
+            }
 
-                if ($order_info['order_status'] == 3) {
-                    $dataList['orderCancled'] = 1;
-                }
+            $dataList['orderCancled'] = 0;
+            $dataList['cancleOrder'] = 0;
 
-                $dataList['directCommision'] = $direct_commision;
-                $dataList['teamCommision'] = $team_commision;
+            if ($order_info['order_status'] < 4) {
+                $dataList['cancleOrder'] = 1;
+            }
 
-                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
+            if ($order_info['order_status'] == 3) {
+                $dataList['orderCancled'] = 1;
+            }
+
+            $dataList['directCommision'] = $direct_commision;
+            $dataList['teamCommision'] = $team_commision;
+
+            return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
             // } catch (\Exception $e) {
             //     return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             // }
         }
     }
 
-    public function getOrderAdditionalInfoByOrderNumber(Request $request) {
+    public function getOrderAdditionalInfoByOrderNumber(Request $request)
+    {
 
         $order_number = (is_null($request->orderNumber) || empty($request->orderNumber)) ? "" : $request->orderNumber;
 
@@ -412,14 +422,14 @@ class OrderController extends Controller
                 if ($order_info['order_status'] == 3) {
                     $dataList['orderCancled'] = 1;
                 }
-
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
         }
     }
 
-    public function cancleOrder(Request $request) {
+    public function cancleOrder(Request $request)
+    {
 
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
         $orderNumber = (is_null($request->orderNumber) || empty($request->orderNumber)) ? "" : $request->orderNumber;
