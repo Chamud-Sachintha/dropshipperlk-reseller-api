@@ -166,7 +166,7 @@ class OrderController extends Controller
                     // $dataList[$key]['quantity'] = $value['quantity'];
                     $dataList[$key]['totalAmount'] = $value['total_amount'];
 
-                    if ($incourierDetails['way_bill']) {
+                    if ($incourierDetails != null) {
                         $dataList[$key]['TrackingNumber'] = $incourierDetails['way_bill'];
                     } else {
                         $dataList[$key]['TrackingNumber'] = "-";
