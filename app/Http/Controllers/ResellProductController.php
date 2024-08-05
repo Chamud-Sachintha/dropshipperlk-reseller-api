@@ -138,7 +138,7 @@ class ResellProductController extends Controller
             return $this->AppHelper->responseMessageHandle(0, "ProductId is required.");
         } else {
             
-            // try {
+            try {
                 $seller_info = $this->Reseller->find_by_token($request_token);
 
                 $cart = $this->Cart->getCartBySeller($seller_info->id);
@@ -168,9 +168,9 @@ class ResellProductController extends Controller
                 } else {
                     return $this->AppHelper->responseMessageHandle(0, "Error Occured.");
                 }
-            // } catch (\Exception $e) {
-            //     return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
-            // }
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
         }
     }
 
