@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
 use App\Models\Category;
+use App\Models\city_list;
 use App\Models\InCourierDetail;
 use App\Models\Order;
 use App\Models\OrderCancle;
@@ -25,6 +26,7 @@ class OrderController extends Controller
     private $OrderCancleLog;
     private $OrderEn;
     private $InCourierInfo;
+    private $CityList;
 
     public function __construct()
     {
@@ -37,6 +39,7 @@ class OrderController extends Controller
         $this->OrderCancleLog = new OrderCancle();
         $this->OrderEn = new  OrderEn();
         $this->InCourierInfo = new InCourierDetail();
+        $this->CityList = new city_list();
     }
 
     public function placeNewOrderRequest(Request $request)
@@ -54,6 +57,10 @@ class OrderController extends Controller
         $quantity = (is_null($request->quantity) || empty($request->quantity)) ? "" : $request->quantity;
         $bankSlip = (is_null($request->bankSlip) || empty($request->bankSlip)) ? "" : $request->bankSlip;
         $FinalTotal = (is_null($request->FinalTotal) || empty($request->FinalTotal)) ? "" : $request->FinalTotal;
+
+        if (!$this->validateCity($city)) {
+            return $this->AppHelper->responseMessageHandle(0, "Invalid City.");
+        }
 
         if ($request_token == "") {
             return $this->AppHelper->responseMessageHandle(0, "Token is required.");
@@ -474,5 +481,16 @@ class OrderController extends Controller
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
         }
+    }
+
+    private function validateCity($city) {
+        $is_city_valid = false;
+        $city_info = $this->CityList->find_by_city($city);
+
+        if ($city_info) {
+            $is_city_valid = true;
+        }
+
+        return $is_city_valid;
     }
 }

@@ -12,4 +12,10 @@ class city_list extends Model
     public function query_all() {
         return $this->all();
     }
+
+    public function find_by_city($cityName) {
+        $map['city'] = $cityName;
+
+        return $this->where($map)->first();
+    }
 }
