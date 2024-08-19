@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
 use App\Models\Order;
+use App\Models\OrderEn;
 use App\Models\Product;
 use App\Models\ProfitShare;
 use App\Models\Reseller;
@@ -16,6 +17,7 @@ class ProfitShareController extends Controller
     private $Reseller;
     private $Product;
     private $Order;
+    private $OrderEn;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class ProfitShareController extends Controller
         $this->Reseller = new Reseller();
         $this->Product = new Product();
         $this->Order = new Order();
+        $this->OrderEn = new OrderEn();
     }
 
     public function getProfitShareLogBySeller(Request $request) {
@@ -34,7 +37,7 @@ class ProfitShareController extends Controller
             return $this->AppHelper->responseMessageHandle(0, "Token is required");
         } else {
 
-          //   try {
+            // try {
                 $seller_info = $this->Reseller->find_by_token($request_token);
                 $resp = $this->ProfitShareLog->get_log_by_seller($seller_info['id']);
 
@@ -65,6 +68,16 @@ class ProfitShareController extends Controller
                         $dataList[$key]['logType'] = "Transfer Out";
                     }
 
+                    $dataList[$key]['productPrice'] = $product_info['price'];
+
+                    $orderEnInfo = $this->OrderEn->getOrderInfoByOrderNumber($order_info['order']);
+
+                    $dataList[$key]['deliveryCharge'] = 0;
+
+                    if ($orderEnInfo['payment_method'] != 3) {
+                        $dataList[$key]['deliveryCharge'] = 350;
+                    }
+
                     $dataList[$key]['resellPrice'] = $value['resell_price'];
                     $dataList[$key]['quantity'] = $value['quantity'];
                     $dataList[$key]['totalAmount'] = $value['total_amount'];
@@ -77,7 +90,7 @@ class ProfitShareController extends Controller
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
             // } catch (\Exception $e) {
             //     return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
-        // }
+            // }
         }
     }
 }

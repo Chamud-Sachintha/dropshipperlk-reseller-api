@@ -13,6 +13,7 @@ use App\Http\Controllers\ResellerController;
 use App\Http\Controllers\ResellProductController;
 use App\Http\Controllers\BankDetailsController;
 use App\Http\Controllers\CityListController;
+use App\Http\Controllers\ExcelExportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -73,3 +74,4 @@ Route::middleware('authToken')->post('update-product-from-price', [ResellProduct
 Route::middleware('authToken')->post('get-cart-total', [CartController::class, 'getCartTotalAmount']);
 
 Route::middleware('authToken')->post('get-city-list', [CityListController::class, 'getAllCityList']);
+Route::middleware('authToken')->post('DownloadExcel', [ExcelExportController::class, 'DownloadExcel']);

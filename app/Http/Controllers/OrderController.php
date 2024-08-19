@@ -57,6 +57,7 @@ class OrderController extends Controller
         $quantity = (is_null($request->quantity) || empty($request->quantity)) ? "" : $request->quantity;
         $bankSlip = (is_null($request->bankSlip) || empty($request->bankSlip)) ? "" : $request->bankSlip;
         $FinalTotal = (is_null($request->FinalTotal) || empty($request->FinalTotal)) ? "" : $request->FinalTotal;
+        $remark = (is_null($request->remark) || empty($request->remark)) ? "" : $request->remark;
 
         if (!$this->validateCity($city)) {
             return $this->AppHelper->responseMessageHandle(0, "Invalid City.");
@@ -129,6 +130,7 @@ class OrderController extends Controller
 
                     $orderInfo['isResellerCompleted'] = 0;
                     $orderInfo['createTime'] = $this->AppHelper->get_date_and_time();
+                    $orderInfo['remarkInfo'] = $remark;
 
                     $create_order = $this->OrderEn->add_log($orderInfo);
 
@@ -215,6 +217,8 @@ class OrderController extends Controller
                     $dateTime = new DateTime($value['created_at']);
                     $formattedDate = $dateTime->format('Y-m-d');
 
+                    $dataList[$key]['remark'] = $value['remark'];
+                    $dataList[$key]['holdNotice'] = $value['hold_notice'];
                     $dataList[$key]['orderPlaceDate'] = $formattedDate;
                 }
 
@@ -376,6 +380,12 @@ class OrderController extends Controller
 
             $dataList['directCommision'] = $direct_commision;
             $dataList['teamCommision'] = $team_commision;
+            
+            if ($order_info['hold_notice'] != null || !empty($order_info['hold_notice'])) {
+                $dataList['holdNotice'] = $order_info['hold_notice'];
+            } else {
+                $dataList['holdNotice'] = null;
+            }
 
             return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
             // } catch (\Exception $e) {

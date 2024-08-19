@@ -19,6 +19,8 @@ class OrderEn extends Model
         'order_status',                         // 0 - pending 1- hold 2- packaging 3- cancel 4- in courier 5- delivered
         'tracking_number',
         'is_reseller_completed',
+        'remark',
+        'hold_notice',
         'create_time'
     ];
 
@@ -31,6 +33,7 @@ class OrderEn extends Model
         $map['payment_status'] = 0;
         $map['order_status'] = 0;
         $map['is_reseller_completed'] = $orderInfo['isResellerCompleted'];
+        $map['remark'] = $orderInfo['remarkInfo'];
         $map['create_time'] = $orderInfo['createTime'];
 
         return $this->create($map);
@@ -110,5 +113,11 @@ class OrderEn extends Model
         $map['order_status'] = 5;
 
         return $this->where($map)->count();
+    }
+
+    public function getById($id) {
+        $map['id'] = $id;
+
+        return $this->where($map)->first();
     }
 }

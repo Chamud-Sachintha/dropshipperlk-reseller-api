@@ -16,6 +16,11 @@ class InCourierDetail extends Model
         'create_time',
     ];
 
+    public function find_by_order_id($orderNumber) {
+        $map['order'] = $orderNumber;
+        return $this->where($map)->first();
+    }
+
     public function find_by_order($order) {
         $map['order'] = $order;
 

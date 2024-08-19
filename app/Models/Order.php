@@ -30,6 +30,16 @@ class Order extends Model
         'create_time'
     ];
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    public function orderEn()
+    {
+        return $this->hasOne(OrderEn::class, 'order', 'order');
+    }
+
     public function add_log($orderInfo) {
         $map['reseller_id'] = $orderInfo['resellerId'];
         $map['product_id'] = $orderInfo['productId'];

@@ -30,7 +30,6 @@ class OrderEnController extends Controller
     }
 
     public function placeNewOrder(Request $request) {
-
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
         $paymentMethod = (is_null($request->paymentMethod) || empty($request->paymentMethod)) ? "" : $request->paymentMethod;
         $bankSlip = (is_null($request->bankSlip) || empty($request->bankSlip)) ? "" : $request->bankSlip;
@@ -45,6 +44,8 @@ class OrderEnController extends Controller
         $s_contact = (is_null($request->secondContact) || empty($request->secondContact)) ? "" : $request->secondContact;
 
         $f_total = (is_null($request->FinalTotal) || empty($request->FinalTotal)) ? "" : $request->FinalTotal;
+        $remark = (is_null($request->remark) || empty($request->remark)) ? "" : $request->remark;
+
         if (!empty($f_total) && substr($f_total, -3) !== '.00') {
             $f_total .= '.00';
         }
@@ -78,10 +79,10 @@ class OrderEnController extends Controller
                     }
 
                     $orderInfo['isResellerCompleted'] = 0;
+                    $orderInfo['remarkInfo'] = $remark;
                     $orderInfo['createTime'] = $this->AppHelper->get_date_and_time();
 
                     $create_order = $this->OrderEn->add_log($orderInfo);
-
                     if ($create_order) {
                         $cart_items_list = $this->CartItem->getAllCartItemsBySeller($cart_info['id']);
 

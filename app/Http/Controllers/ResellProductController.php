@@ -57,6 +57,10 @@ class ResellProductController extends Controller
                 $product = $this->Product->find_by_id($productId);
                 $reseller = $this->Reseller->find_by_token($request_token);
 
+                if ($resellPrice < $product->price) {
+                    return $this->AppHelper->responseMessageHandle(0, "Resell Price Must be Greater than product price");
+                }
+
                 if ($product) {
                     $resellInfo = array();
                     $resellInfo['resellerId'] = $reseller->id;
