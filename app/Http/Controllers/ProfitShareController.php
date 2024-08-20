@@ -75,6 +75,7 @@ class ProfitShareController extends Controller
                         $dataList[$key]['productPrice'] = "Not Found";
                     }
 
+                    dd($order_info);
                     $orderEnInfo = $this->OrderEn->getOrderInfoByOrderNumber($order_info['order']);
 
                     $dataList[$key]['deliveryCharge'] = 0;
