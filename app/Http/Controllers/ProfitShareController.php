@@ -68,7 +68,11 @@ class ProfitShareController extends Controller
                         $dataList[$key]['logType'] = "Transfer Out";
                     }
 
-                    $dataList[$key]['productPrice'] = $product_info['price'];
+                    if ($product_info != null) {
+                        $dataList[$key]['productPrice'] = $product_info['price'];
+                    } else {
+                        $dataList[$key]['productPrice'] = "Not Found";
+                    }
 
                     $orderEnInfo = $this->OrderEn->getOrderInfoByOrderNumber($order_info['order']);
 
