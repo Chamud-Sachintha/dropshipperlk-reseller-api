@@ -75,13 +75,14 @@ class ProfitShareController extends Controller
                         $dataList[$key]['productPrice'] = "Not Found";
                     }
 
-                    dd($order_info);
-                    $orderEnInfo = $this->OrderEn->getOrderInfoByOrderNumber($order_info['order']);
-
                     $dataList[$key]['deliveryCharge'] = 0;
 
-                    if ($orderEnInfo['payment_method'] != 3) {
-                        $dataList[$key]['deliveryCharge'] = 350;
+                    if ($order_info != null) {
+                        $orderEnInfo = $this->OrderEn->getOrderInfoByOrderNumber($order_info['order']);
+
+                        if ($orderEnInfo['payment_method'] != 3) {
+                            $dataList[$key]['deliveryCharge'] = 350;
+                        }
                     }
 
                     $dataList[$key]['resellPrice'] = $value['resell_price'];
