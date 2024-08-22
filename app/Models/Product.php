@@ -21,6 +21,7 @@ class Product extends Model
         'supplier_name',
         'stock_count',
         'images',
+        'status',
         'create_time'
     ];
 

@@ -34,8 +34,9 @@ class ExcelExportController extends Controller
 
 
         if ($selectedReportType == '1') {
-
             $typerepo = "Order_Report";
+        } else if ($selectedReportType == '2') {
+            $typerepo = "Commision_Report";
         } else {
             return $this->AppHelper->responseMessageHandle(0, "Invalid Type");
         }

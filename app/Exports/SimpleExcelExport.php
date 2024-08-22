@@ -9,12 +9,15 @@ use App\Models\OrderEn;
 use App\Models\OrderCancle;
 use App\Models\BankDetails;
 use App\Models\InCourierDetail;
+use App\Models\ProfitShare;
 use App\Models\ResellProduct;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Facades\Excel;
+
+use function PHPUnit\Framework\returnSelf;
 
 class SimpleExcelExport implements FromCollection
 {
@@ -28,6 +31,9 @@ class SimpleExcelExport implements FromCollection
     private $Reseller;
     private $InCourier;
     private $ResellProduct;
+    private $ProfitShareLog;
+    private $Product;
+    private $OrderEn;
 
     public function __construct($selectedReportType, $sellerID)
     {
@@ -37,6 +43,9 @@ class SimpleExcelExport implements FromCollection
         $this->Reseller = new Reseller();
         $this->InCourier = new InCourierDetail();
         $this->ResellProduct = new ResellProduct();
+        $this->ProfitShareLog = new ProfitShare();
+        $this->Product = new Product();
+        $this->OrderEn = new OrderEn();
     }
 
     public function collection()
@@ -44,7 +53,77 @@ class SimpleExcelExport implements FromCollection
         switch ($this->selectedReportType) {
             case 1:
                 return $this->getOrdersReport($this->sellerID);
+            case 2:
+                return $this->getCommisionReport($this->sellerID);
         }
+    }
+
+    private function getCommisionReport($sellerId) {
+        $seller_info = $this->Reseller->find_by_id($sellerId);
+        $resp = $this->ProfitShareLog->get_log_by_seller($seller_info['id']);
+
+        $dataList = array();
+        foreach ($resp as $key => $value) {
+            $product_info = $this->Product->find_by_id($value['product_id']);
+            $order_info = null;
+            if($value['order_id'] != 0){
+                $order_info = $this->Orders->find_by_id($value['order_id']);
+                $dataList[$key]['orderNumber'] =  $order_info['order'];
+            }
+            else{
+                
+                $dataList[$key]['orderNumber'] =  "-";
+            }
+
+            
+
+            if ($value['product_id'] != 0) {
+                //  $dataList[$key]['productName'] = $product_info['product_name'];
+                $dataList[$key]['productName'] = $product_info['product_name'];
+            } else {
+                $dataList[$key]['productName'] = 0;
+            }
+
+            if ($value['type'] == 1) {
+                $dataList[$key]['logType'] = "Transfer In";
+            } else {
+                $dataList[$key]['logType'] = "Transfer Out";
+            }
+
+            if ($product_info != null) {
+                $dataList[$key]['productPrice'] = $product_info['price'];
+            } else {
+                $dataList[$key]['productPrice'] = "Not Found";
+            }
+
+            $dataList[$key]['deliveryCharge'] = 0;
+
+            if ($order_info != null) {
+                $orderEnInfo = $this->OrderEn->getOrderInfoByOrderNumber($order_info['order']);
+
+                if ($orderEnInfo['payment_method'] != 3) {
+                    $dataList[$key]['deliveryCharge'] = 350;
+                }
+            }
+
+            $dataList[$key]['resellPrice'] = $value['resell_price'];
+            $dataList[$key]['quantity'] = $value['quantity'];
+            $dataList[$key]['totalAmount'] = $value['total_amount'];
+            $dataList[$key]['profit'] = $value['profit'];
+            $dataList[$key]['directCommision'] = $value['direct_commision'];
+            $dataList[$key]['teamCommision'] = $value['team_commision'];
+            $dataList[$key]['profitTotal'] = $value['profit_total'];
+        }
+
+        $headers = [
+            'Order ID', 'Product Name', 'Log Type', 'Product Price', 'Resell Price', 'Quantity', 'Deliver Charge', 'Total Amount', 'Direct Commision', 'Team Commision'
+            ,   'Profit', 'Profit Total'
+        ];
+
+        $collection = collect($dataList);
+        $collection->prepend($headers);
+
+        return $collection;
     }
 
     private function getOrdersReport($sellerID)
@@ -124,7 +203,7 @@ class SimpleExcelExport implements FromCollection
                 // Log the error and skip this order
                 // \Log::error('Error processing order ID: ' . $order->id . ' - ' . $e->getMessage());
                 return null; // Skip this order
-            }
+            }   
         })->filter(); // Filter out any null entries
 
         $headers = [

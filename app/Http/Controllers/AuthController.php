@@ -47,8 +47,14 @@ class AuthController extends Controller
                 $validate_ref = $this->Reseller->validate_ref_code($refCode);
                 $validate_phone = $this->Reseller->find_by_phone($phoneNumber);
 
+                $validate_nic = $this->Reseller->find_by_nic($nicNumbe);
+
                 if (!empty($validate_phone)) {
                     return $this->AppHelper->responseMessageHandle(0, "Already Registred Phone Number.");
+                }
+
+                if (!empty($validate_nic)) {
+                    return $this->AppHelper->responseMessageHandle(0, "Already Registered NIC Number");
                 }
 
                 if (empty($validate_ref)) {

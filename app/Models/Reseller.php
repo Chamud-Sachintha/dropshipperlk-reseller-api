@@ -70,6 +70,12 @@ class Reseller extends Model
         return $this->where($map)->get();
     }
 
+    public function get_team_by_ref_code_count($refCode) {
+        $map['ref_code'] = $refCode;
+
+        return $this->where($map)->count();
+    }
+
     public function find_by_phone($phone) {
         $map['phone_number'] = $phone;
 
@@ -99,5 +105,17 @@ class Reseller extends Model
 
         return $this->where(array('id' => $sellerid))->update($map);
 
+    }
+
+    public function find_by_nic($nicNumber) {
+        $map['nic_number'] = $nicNumber;
+
+        return $this->where($map)->first();
+    }
+
+    public function find_by_id($id) {
+        $map['id'] = $id;
+
+        return $this->where($map)->first();
     }
 }

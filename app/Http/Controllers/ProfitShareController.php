@@ -37,7 +37,7 @@ class ProfitShareController extends Controller
             return $this->AppHelper->responseMessageHandle(0, "Token is required");
         } else {
 
-            // try {
+            try {
                 $seller_info = $this->Reseller->find_by_token($request_token);
                 $resp = $this->ProfitShareLog->get_log_by_seller($seller_info['id']);
 
@@ -95,9 +95,9 @@ class ProfitShareController extends Controller
                 }
 
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
-            // } catch (\Exception $e) {
-            //     return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
-            // }
+            } catch (\Exception $e) {
+                return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
+            }
         }
     }
 }

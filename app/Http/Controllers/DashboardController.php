@@ -42,6 +42,10 @@ class DashboardController extends Controller
             $received_earnings = $this->ProfitShareLog->get_total_earnings($seller_info['id']);
             $pending_payment = $this->OrderEn->get_pending_payment($seller_info['id']);
 
+            $total_team_commision = $this->ProfitShareLog->get_team_com_by_seller($seller_info['id']);
+            $total_direct_commision = $this->ProfitShareLog->get_direct_com_by_seller($seller_info['id']);
+            $team_count = $this->Reseller->get_team_by_ref_code_count($seller_info['code']);
+
             $dataList['pendingOrderCount'] = $pending_orders;
             $dataList['inCourierOrderCount'] = $in_courier_orders;
             $dataList['completeOrderCount'] = $complete_corders;
@@ -52,6 +56,10 @@ class DashboardController extends Controller
             $dataList['pendingPayment'] = $pending_payment;
             $dataList['Deleriverd'] = $delivered_corders;
             $dataList['refCode'] = $seller_info['code'];
+
+            $dataList['teamCommisionTotal'] = $total_team_commision;
+            $dataList['directCommisionTotal'] = $total_direct_commision;
+            $dataList['teamCount'] = $team_count;
 
             return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
         } else {
