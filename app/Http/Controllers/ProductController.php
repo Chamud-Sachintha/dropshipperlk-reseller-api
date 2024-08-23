@@ -241,6 +241,12 @@ class ProductController extends Controller
                     $dataList[$key]['images'] = json_decode($value['images'])->image0;
                     $dataList[$key]['createTime'] = $value['create_time'];
 
+                    if ($value['status'] == 1) {
+                        $dataList[$key]['inStock'] = true;
+                    } else {
+                        $dataList[$key]['inStock'] = false;
+                    }
+
                 }
                 
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList, $AllCategory);
