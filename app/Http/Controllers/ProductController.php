@@ -239,6 +239,8 @@ class ProductController extends Controller
                     $dataList[$key]['description'] = $value['description'];
                     $dataList[$key]['price'] = $value['price'];
 
+                    dd($value['images']);
+                    
                     if ($value['images'] != null) {
                         $dataList[$key]['images'] = json_decode($value['images'])->image0;
                     } else {
