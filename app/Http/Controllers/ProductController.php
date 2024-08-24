@@ -239,8 +239,6 @@ class ProductController extends Controller
                     $dataList[$key]['description'] = $value['description'];
                     $dataList[$key]['price'] = $value['price'];
 
-                    dd($value['images']);
-                    
                     if ($value['images'] != null) {
                         $dataList[$key]['images'] = json_decode($value['images'])->image0;
                     } else {
@@ -260,6 +258,7 @@ class ProductController extends Controller
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList, $AllCategory);
                 
             } catch (\Exception $e) {
+                dd($value['images']);
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
         }
