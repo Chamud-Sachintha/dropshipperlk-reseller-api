@@ -40,11 +40,14 @@ class DashboardController extends Controller
             $cancle_orders = $this->OrderEn->get_camcle_count_by_seller($seller_info['id']);
             $paid_orders = $this->OrderEn->get_paid_order_count($seller_info['id']);
             $received_earnings = $this->ProfitShareLog->get_total_earnings($seller_info['id']);
-            $pending_payment = $this->OrderEn->get_pending_payment($seller_info['id']);
+            $pending_payment = $this->Reseller->get_pending_payout($seller_info['id']);
 
             $total_team_commision = $this->ProfitShareLog->get_team_com_by_seller($seller_info['id']);
             $total_direct_commision = $this->ProfitShareLog->get_direct_com_by_seller($seller_info['id']);
             $team_count = $this->Reseller->get_team_by_ref_code_count($seller_info['code']);
+
+            $hold_orders = $this->OrderEn->get_hold_order_count($seller_info['id']);
+            $return_orderds = $this->OrderEn->get_return_order_count($seller_info['id']);
 
             $dataList['pendingOrderCount'] = $pending_orders;
             $dataList['inCourierOrderCount'] = $in_courier_orders;
@@ -56,6 +59,9 @@ class DashboardController extends Controller
             $dataList['pendingPayment'] = $pending_payment;
             $dataList['Deleriverd'] = $delivered_corders;
             $dataList['refCode'] = $seller_info['code'];
+
+            $dataList['holdOrderCount'] = $hold_orders;
+            $dataList['returnOrderCount'] = $return_orderds;
 
             $dataList['teamCommisionTotal'] = $total_team_commision;
             $dataList['directCommisionTotal'] = $total_direct_commision;

@@ -113,6 +113,12 @@ class Reseller extends Model
         return $this->where($map)->first();
     }
 
+    public function get_pending_payout($seller) {
+        $map['id'] = $seller;
+    
+        return $this->where($map)->pluck('profit_total')->first();
+    }
+
     public function find_by_id($id) {
         $map['id'] = $id;
 

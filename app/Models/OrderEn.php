@@ -109,6 +109,20 @@ class OrderEn extends Model
         return $this->where($map)->sum("total_amount");
     }
 
+    public function get_hold_order_count($seller) {
+        $map['reseller_id'] = $seller;
+        $map['order_status'] = 1;
+
+        return $this->where($map)->count();
+    }
+
+    public function get_return_order_count($seller) {
+        $map['reseller_id'] = $seller;
+        $map['order_status'] = 6;
+
+        return $this->where($map)->count();
+    }
+
     public function get_pending_count($seller) {
         $map['reseller_id'] = $seller;
         $map['order_status'] = 5;

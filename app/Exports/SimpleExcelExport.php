@@ -113,11 +113,12 @@ class SimpleExcelExport implements FromCollection
             $dataList[$key]['directCommision'] = $value['direct_commision'];
             $dataList[$key]['teamCommision'] = $value['team_commision'];
             $dataList[$key]['profitTotal'] = $value['profit_total'];
+            $dataList[$key]['date'] = date('Y-m-d H:i:s', $value['create_time']);
         }
 
         $headers = [
             'Order ID', 'Product Name', 'Log Type', 'Product Price', 'Resell Price', 'Quantity', 'Deliver Charge', 'Total Amount', 'Direct Commision', 'Team Commision'
-            ,   'Profit', 'Profit Total'
+            ,   'Profit', 'Profit Total', 'Create Date'
         ];
 
         $collection = collect($dataList);
