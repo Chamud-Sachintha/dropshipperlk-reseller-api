@@ -174,10 +174,15 @@ class OrderController extends Controller
                     // $dataList[$key]['resellPrice'] = $resell_info['price'];
                     // $dataList[$key]['quantity'] = $value['quantity'];
                     $dataList[$key]['totalAmount'] = $value['total_amount'];
+                    $dataList[$key]['courierName'] = $value['courier_name'];
 
                     if ($incourierDetails != null) {
                         $dataList[$key]['TrackingNumber'] = $incourierDetails['way_bill'];
+                        $dataList[$key]['courierName'] = "CeylonEx";
+                    } else if ($value['tracking_number'] != null) {
+                        $dataList[$key]['TrackingNumber'] = $value['tracking_number'];
                     } else {
+                        $dataList[$key]['courierName'] = "-";
                         $dataList[$key]['TrackingNumber'] = "-";
                     }
                     // if ( $value['courier_name'] == "") {
@@ -185,8 +190,6 @@ class OrderController extends Controller
                     // } else {
                     //     $dataList[$key]['courierName'] = $value['courier_name'];
                     // }
-
-                    $dataList[$key]['courierName'] = "CeylonEx";
 
                     if ($value['payment_status'] == 0) {
                         $dataList[$key]['paymentStatus'] = "Pending";

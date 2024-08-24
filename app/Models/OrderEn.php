@@ -18,6 +18,7 @@ class OrderEn extends Model
         'payment_status',                       // 0- pending 1- paid  2- refund
         'order_status',                         // 0 - pending 1- hold 2- packaging 3- cancel 4- in courier 5- delivered
         'tracking_number',
+        'courier_name',
         'is_reseller_completed',
         'remark',
         'hold_notice',
