@@ -258,7 +258,8 @@ class ProductController extends Controller
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList, $AllCategory);
                 
             } catch (\Exception $e) {
-                dd($value['images']);
+                $image_list = count($value['images']);
+                dd($image_list);
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
         }
