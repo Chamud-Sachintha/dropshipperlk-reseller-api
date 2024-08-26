@@ -113,11 +113,11 @@ class SimpleExcelExport implements FromCollection
             $dataList[$key]['directCommision'] = $value['direct_commision'];
             $dataList[$key]['teamCommision'] = $value['team_commision'];
             $dataList[$key]['profitTotal'] = $value['profit_total'];
-            $dataList[$key]['date'] = date('Y-m-d H:i:s', $value['create_time']);
+            $dataList[$key]['date'] = date('Y-m-d', $value['create_time']);
         }
 
         $headers = [
-            'Order ID', 'Product Name', 'Log Type', 'Product Price', 'Resell Price', 'Quantity', 'Deliver Charge', 'Total Amount', 'Direct Commision', 'Team Commision'
+            'Order ID', 'Product Name', 'Log Type', 'Product Price', 'Deliver Charge', 'Resell Price', 'Quantity', 'Total Amount', 'Direct Commision', 'Team Commision'
             ,   'Profit', 'Profit Total', 'Create Date'
         ];
 
@@ -198,7 +198,8 @@ class SimpleExcelExport implements FromCollection
                     'Quantity' => $order->quantity,
                     'Total Amount' => $fullAmount,
                     'Order Return Status' => $refundStatus,
-                    'WayBill' => $wayBillNo
+                    'WayBill' => $wayBillNo,
+                    'Date' => date('Y-m-d', $order->orderEn->create_time)
                 ];
             } catch (\Exception $e) {
                 // Log the error and skip this order
@@ -209,7 +210,7 @@ class SimpleExcelExport implements FromCollection
 
         $headers = [
             'Order ID', 'Product Name', 'Product Price', 'Delivery Charge', 'Seller Price', 'Tracking No', 'Courier Name', 'Order Status', 'Name', 'Address',
-            'City', 'District', 'Contact 1', 'Contact 2', 'Quantity', 'Total Amount', 'Order Return Status','WayBill'
+            'City', 'District', 'Contact 1', 'Contact 2', 'Quantity', 'Total Amount', 'Order Return Status','WayBill', 'Date'
         ];
 
         $dataArray->prepend($headers);

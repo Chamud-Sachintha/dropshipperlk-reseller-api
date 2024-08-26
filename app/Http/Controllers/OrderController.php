@@ -213,6 +213,16 @@ class OrderController extends Controller
                         $dataList[$key]['orderStatus'] = "Delivered";
                     } else if ($value['order_status'] == 6) {
                         $dataList[$key]['orderStatus'] = "Returned";
+                    } else if ($value['order_status'] == 7) {
+                        $dataList[$key]['orderStatus'] = "Completed";
+                    } else if ($value['order_status'] == 8) {
+                        $dataList[$key]['orderStatus'] = "Settled";
+                    } else if ($value['order_status'] == 9) {
+                        $dataList[$key]['orderStatus'] = "Return Recieved";
+                    } else if ($value['order_status'] == 10) {
+                        $dataList[$key]['orderStatus'] = "Ready to Change";
+                    } else if ($value['order_status'] == 11) {
+                        $dataList[$key]['orderStatus'] = "Resheduled";
                     } else {
                         $dataList[$key]['orderStatus'] = "Complted";
                     }

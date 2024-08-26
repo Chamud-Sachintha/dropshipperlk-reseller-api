@@ -32,7 +32,8 @@ class ProductController extends Controller
         $this->Cart = new Cart();
     }
 
-    public function getAllProductList(Request $request) {
+    public function getAllProductList(Request $request)
+    {
 
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
 
@@ -61,16 +62,14 @@ class ProductController extends Controller
                     }
 
                     $decodedImages = json_decode($value['images']);
-                    if ($decodedImages && isset($decodedImages->image0) && !empty($decodedImages->image0)){
-                    $dataList[$key]['images'] = json_decode($value['images'])->image0;
-                    }
-                    else{
+                    if ($decodedImages && isset($decodedImages->image0) && !empty($decodedImages->image0)) {
+                        $dataList[$key]['images'] = json_decode($value['images'])->image0;
+                    } else {
                         $dataList[$key]['image'] = '';
                     }
                     $dataList[$key]['createTime'] = $value['create_time'];
-
                 }
-                
+
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList, $AllCategory);
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
@@ -78,7 +77,8 @@ class ProductController extends Controller
         }
     }
 
-    public function getProductInfoByProductId(Request $request) {
+    public function getProductInfoByProductId(Request $request)
+    {
 
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
         $productId = (is_null($request->pid) || empty($request->pid)) ? "" : $request->pid;
@@ -109,10 +109,10 @@ class ProductController extends Controller
                     $dataList['is_store_pick'] = $resp['is_store_pick'];
                     $dataList['teamCommision'] = $resp['team_commision'];
                     $dataList['directCommision'] = $resp['direct_commision'];
-                    $dataList['images']= json_decode($resp->images);
-                    $dataList['Stock']= $resp['stock_count'];
+                    $dataList['images'] = json_decode($resp->images);
+                    $dataList['Stock'] = $resp['stock_count'];
                     $dataList['StockStatus'] = $resp['status'];
-                    
+
                     if ($resel_resp) {
                         $dataList['isResell'] = true;
                     } else {
@@ -126,7 +126,6 @@ class ProductController extends Controller
                     $dataList['out_of_colombo_charges'] = $out_of_colombo_fees;
 
                     return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
-
                 } else {
                     return $this->AppHelper->responseMessageHandle(0, "Invalid Product ID");
                 }
@@ -136,66 +135,57 @@ class ProductController extends Controller
         }
     }
 
-    public function getAllResellProductsDeliverycharg(Request $request){
+    public function getAllResellProductsDeliverycharg(Request $request)
+    {
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
-       
+
         if ($request_token == "") {
             return $this->AppHelper->responseMessageHandle(0, "Token is required.");
-        }
-        else 
-        {
-           
-           try {    
-                    $dataList = array();
-                    $sellerID = Reseller::where('token',$request_token)->pluck('id');
-                    $CartId = Cart::where('seller_id', $sellerID)->pluck('id');
-                    $productIds = CartItem::where('cart_id',$CartId) ->select('product_id') ->distinct() ->pluck('product_id');
-                    $totalWeight = Product::whereIn('id', $productIds)->sum('weight');
+        } else {
 
-                    $in_colombo_fees = $this->getCourierCharge(true, $totalWeight);
-                    $out_of_colombo_fees = $this->getCourierCharge(false, $totalWeight);
-                    $dataList['in_colombo_charges'] = $in_colombo_fees;
-                    $dataList['out_of_colombo_charges'] = $out_of_colombo_fees;
-                    return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
-                  
-               
+            try {
+                $dataList = array();
+                $sellerID = Reseller::where('token', $request_token)->pluck('id');
+                $CartId = Cart::where('seller_id', $sellerID)->pluck('id');
+                $productIds = CartItem::where('cart_id', $CartId)->select('product_id')->distinct()->pluck('product_id');
+                $totalWeight = Product::whereIn('id', $productIds)->sum('weight');
+
+                $in_colombo_fees = $this->getCourierCharge(true, $totalWeight);
+                $out_of_colombo_fees = $this->getCourierCharge(false, $totalWeight);
+                $dataList['in_colombo_charges'] = $in_colombo_fees;
+                $dataList['out_of_colombo_charges'] = $out_of_colombo_fees;
+                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
-            
-            
         }
     }
 
-    public function getAllResellProductsDeliverychargProId(Request $request){
+    public function getAllResellProductsDeliverychargProId(Request $request)
+    {
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
-       
+
         if ($request_token == "") {
             return $this->AppHelper->responseMessageHandle(0, "Token is required.");
-        }
-        else 
-        {
-           
-           try {    
-                    $dataList = array();
-                    $productIds = $request->productId;
-                    $totalWeight = Product::where('id', $productIds)->pluck('weight')->first();
-                    $in_colombo_fees = $this->getCourierCharge(true, $totalWeight);
-                    $out_of_colombo_fees = $this->getCourierCharge(false, $totalWeight);
-                    $dataList['in_colombo_charges'] = $in_colombo_fees;
-                    $dataList['out_of_colombo_charges'] = $out_of_colombo_fees;
-                    return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
-                  
-               
+        } else {
+
+            try {
+                $dataList = array();
+                $productIds = $request->productId;
+                $totalWeight = Product::where('id', $productIds)->pluck('weight')->first();
+                $in_colombo_fees = $this->getCourierCharge(true, $totalWeight);
+                $out_of_colombo_fees = $this->getCourierCharge(false, $totalWeight);
+                $dataList['in_colombo_charges'] = $in_colombo_fees;
+                $dataList['out_of_colombo_charges'] = $out_of_colombo_fees;
+                return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList);
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
-            
-            
         }
     }
 
-    private function getCourierCharge($is_colombo, $product_weight) {
+    private function getCourierCharge($is_colombo, $product_weight)
+    {
 
         $default_charge = 350;
         $weight_in_kg = ($product_weight) / 1000;
@@ -203,7 +193,7 @@ class ProductController extends Controller
         if ($weight_in_kg > 1) {
             $remaining = $weight_in_kg - 1;
             $round_remaining = ceil($remaining);
-            
+
             if ($round_remaining > 0) {
                 $default_charge += ($round_remaining * 50);
             }
@@ -216,7 +206,8 @@ class ProductController extends Controller
         return $default_charge;
     }
 
-    public function getCIDProductList(Request $request){
+    public function getCIDProductList(Request $request)
+    {
 
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
 
@@ -240,7 +231,7 @@ class ProductController extends Controller
                     $dataList[$key]['price'] = $value['price'];
 
                     $image_list = json_decode($value['images']);
-                    
+
                     if ($image_list != null) {
                         $dataList[$key]['images'] = json_decode($value['images'])->image0;
                     } else {
@@ -254,11 +245,9 @@ class ProductController extends Controller
                     } else {
                         $dataList[$key]['inStock'] = false;
                     }
-
                 }
-                
+
                 return $this->AppHelper->responseEntityHandle(1, "Operation Complete", $dataList, $AllCategory);
-                
             } catch (\Exception $e) {
                 return $this->AppHelper->responseMessageHandle(0, $e->getMessage());
             }
