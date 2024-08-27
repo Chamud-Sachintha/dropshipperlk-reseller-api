@@ -41,7 +41,7 @@ class ProfitShare extends Model
     public function get_log_by_seller($seller) {
         $map['reseller_id'] = $seller;
 
-        return $this->where($map)->get();
+        return $this->where($map)->orderBy('id', 'desc')->get();
     }
 
     public function get_total_earnings($seller) {
