@@ -165,7 +165,7 @@ class SimpleExcelExport implements FromCollection
                     7 => "Complete",
                     8 => "Settled",
                     9 => "Return Recieved",
-                    10 => "Ready to Change",
+                    10 => "Rider Assigned",
                     11 => "Rescheduled"
                 ];
 

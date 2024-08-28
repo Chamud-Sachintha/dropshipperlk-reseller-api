@@ -220,7 +220,7 @@ class OrderController extends Controller
                     } else if ($value['order_status'] == 9) {
                         $dataList[$key]['orderStatus'] = "Return Recieved";
                     } else if ($value['order_status'] == 10) {
-                        $dataList[$key]['orderStatus'] = "Ready to Change";
+                        $dataList[$key]['orderStatus'] = "Rider Assigned";
                     } else if ($value['order_status'] == 11) {
                         $dataList[$key]['orderStatus'] = "Resheduled";
                     } else {
