@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\OrderEn;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 

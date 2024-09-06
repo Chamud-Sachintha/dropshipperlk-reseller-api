@@ -14,6 +14,7 @@ use App\Http\Controllers\ResellProductController;
 use App\Http\Controllers\BankDetailsController;
 use App\Http\Controllers\CityListController;
 use App\Http\Controllers\ExcelExportController;
+use App\Http\Controllers\ExcelOrderTmpController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -75,3 +76,6 @@ Route::middleware('authToken')->post('get-cart-total', [CartController::class, '
 
 Route::middleware('authToken')->post('get-city-list', [CityListController::class, 'getAllCityList']);
 Route::middleware('authToken')->post('DownloadExcel', [ExcelExportController::class, 'DownloadExcel']);
+
+Route::middleware('authToken')->post('excel-upload-orders', [ExcelOrderTmpController::class, 'uploadOrdersFromExcelToTmpTable']);
+Route::middleware('authToken')->post('get-temp-order-list', [ExcelOrderTmpController::class, 'getTempOrderList']);

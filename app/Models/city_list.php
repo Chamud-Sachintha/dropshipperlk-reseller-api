@@ -14,8 +14,6 @@ class city_list extends Model
     }
 
     public function find_by_city($cityName) {
-        $map['city'] = $cityName;
-
-        return $this->where($map)->first();
+        return $this->whereRaw('LOWER(city) = ?', [strtolower($cityName)])->first();
     }
 }
