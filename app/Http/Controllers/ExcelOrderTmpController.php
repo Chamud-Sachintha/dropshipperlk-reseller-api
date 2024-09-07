@@ -197,82 +197,163 @@ class ExcelOrderTmpController extends Controller
         
     }
 
+    // private function createTempOrderList($orderData, $reseller) {
+    //     try {
+    //         DB::beginTransaction();
+
+    //         $runningRowNumber = null;
+
+    //         DB::table((new ExcelOrderError())->getTable())->truncate();
+
+    //         for ($eachRow = 1; $eachRow < count($orderData); $eachRow++) {
+    //             $orderDataInfo = array();
+    //             $runningRowNumber = $eachRow + 1;
+
+    //             $resell_product = $this->ResellProduct->find_by_pid_and_sid($reseller->id, $orderData[$eachRow][0]);
+    //             $orderId = $this->generateOrderNumber(10);
+
+    //             $product_info = $this->Product->find_by_id($orderData[$eachRow][0]);
+
+    //             if ($product_info == null || empty($product_info)) {
+    //                 throw new \Exception("Invalid Product ID");
+    //             }
+
+    //             if (!$this->validateCity($orderData[$eachRow][3])) {
+    //                 throw new \Exception("Invalid City");
+    //             }
+    
+    //             $orderDataInfo['productId'] = $orderData[$eachRow][0];
+    //             $orderDataInfo['resellerId'] = $reseller->id;
+    //             $orderDataInfo['order'] =  $orderId;
+    //             $orderDataInfo['name'] = $orderData[$eachRow][1];
+    //             $orderDataInfo['address'] = $orderData[$eachRow][2];
+    //             $orderDataInfo['city'] = $orderData[$eachRow][3];
+    //             $orderDataInfo['district'] = $orderData[$eachRow][4];
+    //             $orderDataInfo['contact_1'] = $orderData[$eachRow][5];
+    //             $orderDataInfo['contact_2'] = $orderData[$eachRow][6];
+    //             $orderDataInfo['quantity'] = $orderData[$eachRow][7];
+    //             $orderDataInfo['totalAmount'] = $resell_product['price'] * $orderData[$eachRow][7];
+    //             $orderDataInfo['paymentMethod'] = $orderData[$eachRow][8];
+    //             $orderDataInfo['bankSlip'] = null;
+    //             $orderDataInfo['isResellerCompleted'] = 0;
+    //             $orderDataInfo['createTime'] = $this->AppHelper->get_date_and_time();
+    
+    //             $orderItemsTmpLog = $this->OrderItemsTmp->add_log($orderDataInfo);
+
+    //             if ($orderItemsTmpLog) {
+    //                 $orderTmpInfo = array();
+    //                 $order_number =  $orderId;
+
+    //                 $orderTmpInfo['resellerId'] = $reseller->id;
+    //                 $orderTmpInfo['order'] = $orderId;
+    //                 $orderTmpInfo['totalAmount'] = $resell_product['price'] * $orderData[$eachRow][7];;
+    //                 $orderTmpInfo['paymentMethod'] = $orderData[$eachRow][8];
+    //                 $orderTmpInfo['isResellerCompleted'] = 0;
+    //                 $orderTmpInfo['createTime'] = $this->AppHelper->get_date_and_time();
+    //                 $orderTmpInfo['remarkInfo'] = null;
+    //                 $orderDataInfo['bankSlip'] = null;
+
+    //                 $this->OrderTmp->add_log($orderDataInfo);
+    //             }
+    //         }
+
+    //         DB::commit();
+    //         return true;
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+
+    //         $erorInfo = array();
+    //         $erorInfo['rowNumber'] = $runningRowNumber;
+    //         $erorInfo['errorMsg'] = $e->getMessage();
+    //         $erorInfo['createTime'] = $this->AppHelper->day_time();
+
+    //         $this->OrderErr->add_log($erorInfo);
+
+    //         return false;
+    //     }
+        
+    // }
+
     private function createTempOrderList($orderData, $reseller) {
+        $runningRowNumber = null;
+    
         try {
-            DB::beginTransaction();
-
-            $runningRowNumber = null;
-
-            DB::table((new ExcelOrderError())->getTable())->truncate();
-
-            for ($eachRow = 1; $eachRow < count($orderData); $eachRow++) {
-                $orderDataInfo = array();
-                $runningRowNumber = $eachRow + 1;
-
-                $resell_product = $this->ResellProduct->find_by_pid_and_sid($reseller->id, $orderData[$eachRow][0]);
-                $orderId = $this->generateOrderNumber(10);
-
-                $product_info = $this->Product->find_by_id($orderData[$eachRow][0]);
-
-                if ($product_info == null || empty($product_info)) {
-                    throw new \Exception("Invalid Product ID");
-                }
-
-                if (!$this->validateCity($orderData[$eachRow][3])) {
-                    throw new \Exception("Invalid City");
-                }
+            return DB::transaction(function () use ($orderData, $reseller, &$runningRowNumber) {
+                // Truncate the ExcelOrderError table
+                DB::table((new ExcelOrderError())->getTable())->truncate();
     
-                $orderDataInfo['productId'] = $orderData[$eachRow][0];
-                $orderDataInfo['resellerId'] = $reseller->id;
-                $orderDataInfo['order'] =  $orderId;
-                $orderDataInfo['name'] = $orderData[$eachRow][1];
-                $orderDataInfo['address'] = $orderData[$eachRow][2];
-                $orderDataInfo['city'] = $orderData[$eachRow][3];
-                $orderDataInfo['district'] = $orderData[$eachRow][4];
-                $orderDataInfo['contact_1'] = $orderData[$eachRow][5];
-                $orderDataInfo['contact_2'] = $orderData[$eachRow][6];
-                $orderDataInfo['quantity'] = $orderData[$eachRow][7];
-                $orderDataInfo['totalAmount'] = $resell_product['price'] * $orderData[$eachRow][7];
-                $orderDataInfo['paymentMethod'] = $orderData[$eachRow][8];
-                $orderDataInfo['bankSlip'] = null;
-                $orderDataInfo['isResellerCompleted'] = 0;
-                $orderDataInfo['createTime'] = $this->AppHelper->get_date_and_time();
+                // Loop through each row in the orderData
+                for ($eachRow = 1; $eachRow < count($orderData); $eachRow++) {
+                    $orderDataInfo = [];
+                    $runningRowNumber = $eachRow + 1; // Adjust the row number
     
-                $orderItemsTmpLog = $this->OrderItemsTmp->add_log($orderDataInfo);
-
-                if ($orderItemsTmpLog) {
-                    $orderTmpInfo = array();
-                    $order_number =  $orderId;
-
-                    $orderTmpInfo['resellerId'] = $reseller->id;
-                    $orderTmpInfo['order'] = $orderId;
-                    $orderTmpInfo['totalAmount'] = $resell_product['price'] * $orderData[$eachRow][7];;
-                    $orderTmpInfo['paymentMethod'] = $orderData[$eachRow][8];
-                    $orderTmpInfo['isResellerCompleted'] = 0;
-                    $orderTmpInfo['createTime'] = $this->AppHelper->get_date_and_time();
-                    $orderTmpInfo['remarkInfo'] = null;
+                    // Find the reseller product and validate
+                    $resell_product = $this->ResellProduct->find_by_pid_and_sid($reseller->id, $orderData[$eachRow][0]);
+                    $orderId = $this->generateOrderNumber(10);
+                    $product_info = $this->Product->find_by_id($orderData[$eachRow][0]);
+    
+                    // Check if the product exists
+                    if (is_null($product_info)) {
+                        throw new \Exception("Invalid Product ID");
+                    }
+    
+                    // Validate the city
+                    if (!$this->validateCity($orderData[$eachRow][3])) {
+                        throw new \Exception("Invalid City");
+                    }
+    
+                    // Prepare order data info
+                    $orderDataInfo['productId'] = $orderData[$eachRow][0];
+                    $orderDataInfo['resellerId'] = $reseller->id;
+                    $orderDataInfo['order'] = $orderId;
+                    $orderDataInfo['name'] = $orderData[$eachRow][1];
+                    $orderDataInfo['address'] = $orderData[$eachRow][2];
+                    $orderDataInfo['city'] = $orderData[$eachRow][3];
+                    $orderDataInfo['district'] = $orderData[$eachRow][4];
+                    $orderDataInfo['contact_1'] = $orderData[$eachRow][5];
+                    $orderDataInfo['contact_2'] = $orderData[$eachRow][6];
+                    $orderDataInfo['quantity'] = $orderData[$eachRow][7];
+                    $orderDataInfo['totalAmount'] = $resell_product['price'] * $orderData[$eachRow][7];
+                    $orderDataInfo['paymentMethod'] = $orderData[$eachRow][8];
                     $orderDataInfo['bankSlip'] = null;
-
-                    $this->OrderTmp->add_log($orderDataInfo);
+                    $orderDataInfo['isResellerCompleted'] = 0;
+                    $orderDataInfo['createTime'] = $this->AppHelper->get_date_and_time();
+    
+                    // Insert into OrderItemsTmp
+                    $orderItemsTmpLog = $this->OrderItemsTmp->add_log($orderDataInfo);
+    
+                    if ($orderItemsTmpLog) {
+                        // Prepare orderTmp data
+                        $orderTmpInfo = [];
+                        $orderTmpInfo['resellerId'] = $reseller->id;
+                        $orderTmpInfo['order'] = $orderId;
+                        $orderTmpInfo['totalAmount'] = $resell_product['price'] * $orderData[$eachRow][7];
+                        $orderTmpInfo['paymentMethod'] = $orderData[$eachRow][8];
+                        $orderTmpInfo['isResellerCompleted'] = 0;
+                        $orderTmpInfo['createTime'] = $this->AppHelper->get_date_and_time();
+                        $orderTmpInfo['remarkInfo'] = null;
+                        $orderTmpInfo['bankSlip'] = null;
+    
+                        // Insert into OrderTmp
+                        $this->OrderTmp->add_log($orderTmpInfo);
+                    }
                 }
-            }
-
-            DB::commit();
-            return true;
+    
+                // Return true on success
+                return true;
+            }, 5); // Optional: Retry the transaction 5 times if it fails
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            $erorInfo = array();
-            $erorInfo['rowNumber'] = $runningRowNumber;
-            $erorInfo['errorMsg'] = $e->getMessage();
-            $erorInfo['createTime'] = $this->AppHelper->day_time();
-
-            $this->OrderErr->add_log($erorInfo);
-
+            // Log the error to ExcelOrderError table
+            $errorInfo = [];
+            $errorInfo['rowNumber'] = $runningRowNumber;
+            $errorInfo['errorMsg'] = $e->getMessage();
+            $errorInfo['createTime'] = $this->AppHelper->day_time();
+    
+            $this->OrderErr->add_log($errorInfo);
+    
             return false;
         }
-        
-    }
+    }    
 
     private function generateOrderNumber($length) {
         $finalOrderNumber = '';
