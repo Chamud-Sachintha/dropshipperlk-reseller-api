@@ -341,7 +341,7 @@ class ExcelOrderTmpController extends Controller
     
                 // Return true on success
                 return true;
-            }, 5); // Optional: Retry the transaction 5 times if it fails
+            }, 10); // Optional: Retry the transaction 5 times if it fails
         } catch (\Exception $e) {
             // Log the error to ExcelOrderError table
             $errorInfo = [];
