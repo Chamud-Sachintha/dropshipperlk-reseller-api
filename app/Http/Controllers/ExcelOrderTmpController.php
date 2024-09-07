@@ -48,8 +48,7 @@ class ExcelOrderTmpController extends Controller
 
     public function clearAllTempOrderTables(Request $request) {
         try {
-            DB::table(new ExcelOrderTmp())->getTable()->truncate();
-            DB::table(new ExcelOrderItemsTmp())->getTable()->truncate();
+            $this->clearTables();
 
             return $this->AppHelper->responseMessageHandle(1, "Operation Successfully");
         } catch (\Exception $e) {
@@ -68,12 +67,10 @@ class ExcelOrderTmpController extends Controller
 
                 $this->OrderItems->save_order_item($orderItemsList->toArray());
                 $this->Order->save_order($eachOrder->toArray());
-
-                $this->OrderItemsTmp->delete_by_order($orderItemsList->toArray());
-                $this->OrderTmp->delete_by_id($eachOrder->toArray());
             }
 
             DB::commit();
+            $this->clearTables();
             return $this->AppHelper->responseMessageHandle(1, "Operation Complete");
         } catch (\Exception $e) {
             DB::rollBack();
@@ -189,7 +186,7 @@ class ExcelOrderTmpController extends Controller
                 fclose($handle);
 
                 if ($this->createTempOrderList($data, $reseller)) {
-                    return $this->AppHelper->responseMessageHandle(0, "Suceess Importing");
+                    return $this->AppHelper->responseMessageHandle(1, "Suceess Importing");
                 } else {
                     return $this->AppHelper->responseMessageHandle(0, "Error Occured While Importing");
                 }
@@ -248,7 +245,7 @@ class ExcelOrderTmpController extends Controller
                     $order_number =  $orderId;
 
                     $orderTmpInfo['resellerId'] = $reseller->id;
-                    $orderTmpInfo['order'] = $order_number;
+                    $orderTmpInfo['order'] = $orderId;
                     $orderTmpInfo['totalAmount'] = $resell_product['price'] * $orderData[$eachRow][7];;
                     $orderTmpInfo['paymentMethod'] = $orderData[$eachRow][8];
                     $orderTmpInfo['isResellerCompleted'] = 0;
@@ -305,5 +302,11 @@ class ExcelOrderTmpController extends Controller
         }
 
         return $is_city_valid;
+    }
+
+    private function clearTables() {
+        DB::table((new ExcelOrderTmp())->getTable())->truncate();
+        DB::table((new ExcelOrderItemsTmp())->getTable())->truncate();
+        DB::table((new ExcelOrderError())->getTable())->truncate();
     }
 }
