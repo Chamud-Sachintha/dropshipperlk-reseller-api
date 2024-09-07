@@ -135,4 +135,8 @@ class OrderEn extends Model
 
         return $this->where($map)->first();
     }
+
+    public function save_order($order) {
+        return $this->create($order);
+    }
 }

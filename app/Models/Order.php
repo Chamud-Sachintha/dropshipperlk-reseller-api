@@ -157,4 +157,8 @@ class Order extends Model
     public function get_all() {
         return $this->all();
     }
+
+    public function save_order_item($orderItem) {
+        return $this->create($orderItem[0]);
+    }
 }

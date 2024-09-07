@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
 use App\Models\city_list;
+use App\Models\ExcelOrderError;
 use App\Models\ExcelOrderItemsTmp;
 use App\Models\ExcelOrderTmp;
 use App\Models\InCourierDetail;
@@ -28,6 +29,7 @@ class ExcelOrderTmpController extends Controller
     private $Product;
     private $CityList;
     private $InCourierInfo;
+    private $OrderErr;
 
     public function __construct()
     {
@@ -41,6 +43,35 @@ class ExcelOrderTmpController extends Controller
         $this->Product = new Product();
         $this->CityList = new city_list();
         $this->InCourierInfo = new InCourierDetail();
+        $this->OrderErr = new ExcelOrderError();
+    }
+
+    public function commitTempOrdersTable(Request $request) {
+        $tempOrderList = $this->OrderTmp->find_all();
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($tempOrderList as $eachOrder) {
+                $orderItemsList = $this->OrderItemsTmp->find_by_order($eachOrder['order']);
+
+                $this->OrderItems->save_order_item($orderItemsList->toArray());
+                $this->Order->save_order($eachOrder->toArray());
+
+                $this->OrderItemsTmp->delete_by_order($orderItemsList->toArray());
+                $this->OrderTmp->delete_by_id($eachOrder->toArray());
+            }
+
+            DB::commit();
+            return $this->AppHelper->responseMessageHandle(1, "Operation Complete");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->AppHelper->responseMessageHandle(0, "Error Occured " . $e->getMessage());
+        }
+    }
+
+    public function getAllErrLogs(Request $request) {
+        return $this->AppHelper->responseEntityHandle(1, "Operation sucesssfully", $this->OrderErr->find_all());
     }
 
     public function getTempOrderList(Request $request) {
@@ -52,7 +83,7 @@ class ExcelOrderTmpController extends Controller
         } else {
             $temp_order_list = $this->OrderTmp->find_all();
 
-            $temporyOrderList = array();
+            $dataList = array();
             foreach ($temp_order_list as $key => $value) {
                 $product_info = $this->Product->find_by_id($value['product_id']);
                 $resell_info = $this->ResellProduct->find_by_pid_and_sid($value['reseller_id'], $value['product_id']);
@@ -162,8 +193,13 @@ class ExcelOrderTmpController extends Controller
         try {
             DB::beginTransaction();
 
+            $runningRowNumber = null;
+
+            DB::table((new ExcelOrderError())->getTable())->truncate();
+
             for ($eachRow = 1; $eachRow < count($orderData); $eachRow++) {
                 $orderDataInfo = array();
+                $runningRowNumber = $eachRow + 1;
 
                 $resell_product = $this->ResellProduct->find_by_pid_and_sid($reseller->id, $orderData[$eachRow][0]);
                 $orderId = $this->generateOrderNumber(10);
@@ -216,6 +252,14 @@ class ExcelOrderTmpController extends Controller
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
+
+            $erorInfo = array();
+            $erorInfo['rowNumber'] = $runningRowNumber;
+            $erorInfo['errorMsg'] = $e->getMessage();
+            $erorInfo['createTime'] = $this->AppHelper->day_time();
+
+            $this->OrderErr->add_log($erorInfo);
+
             return false;
         }
         

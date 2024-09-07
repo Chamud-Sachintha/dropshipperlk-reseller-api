@@ -51,4 +51,16 @@ class ExcelOrderItemsTmp extends Model
 
         return $this->create($map);
     }
+
+    public function find_by_order($order) {
+        $map['order'] = $order;
+
+        return $this->where($map)->get();
+    }
+
+    public function delete_by_order($order) {
+        $map['id'] = $order[0]['id'];
+
+        return $this->where($map)->delete();
+    }
 }

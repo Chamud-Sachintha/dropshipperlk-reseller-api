@@ -79,3 +79,5 @@ Route::middleware('authToken')->post('DownloadExcel', [ExcelExportController::cl
 
 Route::middleware('authToken')->post('excel-upload-orders', [ExcelOrderTmpController::class, 'uploadOrdersFromExcelToTmpTable']);
 Route::middleware('authToken')->post('get-temp-order-list', [ExcelOrderTmpController::class, 'getTempOrderList']);
+Route::middleware('authToken')->post('proceed-temp-orders', [ExcelOrderTmpController::class, 'commitTempOrdersTable']);
+Route::middleware('authToken')->post('get-err-logs', [ExcelOrderTmpController::class, 'getAllErrLogs']);

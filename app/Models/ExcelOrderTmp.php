@@ -42,4 +42,10 @@ class ExcelOrderTmp extends Model
     public function find_all() {
         return $this->all();
     }
+
+    public function delete_by_id($order) {
+        $map['id'] = $order[0]['id'];
+        
+        return $this->where($map)->delete();
+    }
 }
