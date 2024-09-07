@@ -257,6 +257,7 @@ class ExcelOrderTmpController extends Controller
                 }
             }
 
+            DB::commit();
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
