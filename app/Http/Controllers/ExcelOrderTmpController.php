@@ -46,6 +46,17 @@ class ExcelOrderTmpController extends Controller
         $this->OrderErr = new ExcelOrderError();
     }
 
+    public function clearAllTempOrderTables(Request $request) {
+        try {
+            DB::table(new ExcelOrderTmp())->getTable()->truncate();
+            DB::table(new ExcelOrderItemsTmp())->getTable()->truncate();
+
+            return $this->AppHelper->responseMessageHandle(1, "Operation Successfully");
+        } catch (\Exception $e) {
+            return $this->AppHelper->responseMessageHandle(0, "Error Occured " . $e->getMessage());
+        }
+    }
+
     public function commitTempOrdersTable(Request $request) {
         $tempOrderList = $this->OrderTmp->find_all();
 
