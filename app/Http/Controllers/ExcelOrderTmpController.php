@@ -313,7 +313,7 @@ class ExcelOrderTmpController extends Controller
                     'contact_1' => $orderData[$eachRow][5],
                     'contact_2' => $orderData[$eachRow][6],
                     'quantity' => $orderData[$eachRow][7],
-                    'totalAmount' => ($resell_product['price'] * $orderData[$eachRow][7]) + 350,
+                    'totalAmount' => ($resell_product['price'] * $orderData[$eachRow][7]),
                     'paymentMethod' => $orderData[$eachRow][8],
                     'bankSlip' => null,
                     'isResellerCompleted' => 0,
