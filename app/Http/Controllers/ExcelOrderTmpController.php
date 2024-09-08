@@ -328,7 +328,7 @@ class ExcelOrderTmpController extends Controller
                     $orderTmpInfo = [
                         'resellerId' => $reseller->id,
                         'order' => $orderId,
-                        'totalAmount' => $resell_product['price'] * $orderData[$eachRow][7],
+                        'totalAmount' => ($resell_product['price'] * $orderData[$eachRow][7]) + 350,
                         'paymentMethod' => $orderData[$eachRow][8],
                         'isResellerCompleted' => 0,
                         'createTime' => $this->AppHelper->get_date_and_time(),
