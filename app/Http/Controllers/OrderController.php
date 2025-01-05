@@ -339,12 +339,11 @@ class OrderController extends Controller
                 $product_info = $this->Product->find_by_id($value['product_id']);
                 $resell_info = $this->ResellProduct->find_by_pid_and_sid($value['reseller_id'], $value['product_id']);
                 // dd($resell_info['price']);
-                $dataList[$key]['productName'] = $product_info['product_name'];
-                $dataList[$key]['productPrice'] = $product_info['price'];
-                $dataList[$key]['resellPrice'] = $resell_info['price'];
-                $dataList[$key]['quantity'] = $value['quantity'];
-                $dataList[$key]['totalAmount'] = $value['total_amount'];
-
+                $dataList['items'][$key]['productName'] = $product_info['product_name'];
+                $dataList['items'][$key]['productPrice'] = $product_info['price'];
+                $dataList['items'][$key]['resellPrice'] = $resell_info['price'];
+                $dataList['items'][$key]['quantity'] = $value['quantity'];
+                $dataList['items'][$key]['totalAmount'] = $value['total_amount'];
 
                 $direct_commision += $product_info['direct_commision'];
                 $team_commision += $product_info['team_commision'];
