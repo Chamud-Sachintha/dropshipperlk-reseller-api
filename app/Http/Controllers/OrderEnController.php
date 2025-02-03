@@ -30,6 +30,9 @@ class OrderEnController extends Controller
     }
 
     public function placeNewOrder(Request $request) {
+
+        return $this->AppHelper->responseMessageHandle(0, "Ordering is Prohibited this time");
+
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
         $paymentMethod = (is_null($request->paymentMethod) || empty($request->paymentMethod)) ? "" : $request->paymentMethod;
         $bankSlip = (is_null($request->bankSlip) || empty($request->bankSlip)) ? "" : $request->bankSlip;

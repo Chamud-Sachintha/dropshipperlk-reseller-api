@@ -45,6 +45,8 @@ class OrderController extends Controller
     public function placeNewOrderRequest(Request $request)
     {
 
+        return $this->AppHelper->responseMessageHandle(0, "Ordring is Prohibited this time.");
+
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
         $productId = (is_null($request->pid) || empty($request->pid)) ? "" : $request->pid;
         $name = (is_null($request->name) || empty($request->name)) ? "" : $request->name;
