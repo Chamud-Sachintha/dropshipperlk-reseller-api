@@ -23,7 +23,7 @@ class OrderEnController extends Controller
     {
         $this->AppHelper = new AppHelper();
         $this->OrderEn = new OrderEn();
-        $this->Reseller = new Reseller();
+        $this->Reseller = new Reseller(); 
         $this->Cart = new Cart();
         $this->CartItem = new CartItem();
         $this->Order = new Order();
@@ -31,6 +31,7 @@ class OrderEnController extends Controller
 
     public function placeNewOrder(Request $request) {
 
+        //this is comment
         return $this->AppHelper->responseMessageHandle(0, "Ordering is Prohibited this time");
 
         $request_token = (is_null($request->token) || empty($request->token)) ? "" : $request->token;
